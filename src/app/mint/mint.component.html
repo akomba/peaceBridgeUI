@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="col-md-12">
+    <h1 class="display-4 text-center">Mint</h1>
+  </div>
+  <div class="col-md-12 mt-3">
+    <div class="form-group mt-3">
+      <label for="depositAmount">Mint amount</label>
+      <input type="text" class="form-control" id="mintAmount" name="mintAmount" placeholder="Amount" [(ngModel)]="amountToMint">
+    </div>
+    <div class="mt-4 text-center">
+      <button class="btn btn-success" (click)="mint()">Mint</button>
+    </div>
+  </div>
+
+  <div *ngIf="isMintingFinished" class="col-md-12 mt-3">
+    <p><span><b>token id:</b> {{mintedTokenId}}</span></p>
+  </div>
+
+</div>
+
+<div *ngIf="isLoading" id="loader-spinner" class="load-indicator" >
+  <div class="mid">
+    <h4 *ngIf="loaderMessage!=''">{{loaderMessage}}</h4>
+    <span class="glyphicon glyphicon-refresh fast-right-spinner"></span>
+  </div>
+</div>

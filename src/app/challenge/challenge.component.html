@@ -1,0 +1,64 @@
+<div class="row">
+  <div class="col-md-12">
+    <h1 class="display-4 text-center">Challenge</h1>
+  </div>
+
+  <div  *ngIf="errorMessage" class="col-md-12 text-center mt-3">
+    <ngb-alert [type]="'danger'" [dismissible]="false">
+        <strong>Error!</strong> {{errorMessage}}
+    </ngb-alert>
+  </div>
+
+  <div class="col-md-12">
+    <h3 class="text-center">Withdrawal requests</h3>
+    <ul class="list-group transactions">
+      <li *ngFor="let t of withdrawals; let i = index" class="list-group-item">
+          <span class=""><b>txHash:</b> {{t.transactionHash}}</span>
+          <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
+          <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
+          <span class="token-id"><b>token id:</b> {{t.topics[2]}}</span>
+          <button  (click)="openModal(i)"> Challenge this</button>
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<div *ngIf="isLoading" id="loader-spinner" class="load-indicator" >
+  <div class="mid">
+    <h4 *ngIf="loaderMessage!=''">{{loaderMessage}}</h4>
+    <span class="glyphicon glyphicon-refresh fast-right-spinner"></span>
+  </div>
+</div>
+
+<div *ngIf="isChallengeActivated" id="challenge-input" class="input-modal d-flex h-100" >
+  <div class="modal-body justify-content-center align-self-center col-md-6 offset-md-3 ">
+    <div class="close-button" (click)="closeModal()">
+      X
+    </div>
+
+    <h4 class="text-center">Challenge</h4>
+
+    <div class="form-group mt-3">
+      <label for="transferTx">Tranfer transaction hash</label>
+      <input type="text" class="form-control" id="transferTx" name="transferTx" placeholder="0x000...000" [(ngModel)]="transferTxHash">
+    </div>
+    <div class="form-group mt-3">
+      <label for="approvalTx">Custodian approval hash</label>
+      <input type="text" class="form-control" id="approvalTx" name="approvalTx" placeholder="0x000...000" [(ngModel)]="approvalTxHash">
+    </div>
+
+    <label class="form-check-inline">
+        <input class="form-check-input" type="radio" name="type" value="past" [(ngModel)]="challengeType"> With past custody
+    </label>
+    <label class="form-check-inline">
+        <input class="form-check-input" type="radio" name="type" value="future" [(ngModel)]="challengeType"> With future custody
+    </label>
+
+
+    <div class="text-center">
+      <button>Challenge</button>
+    </div>
+
+  </div>
+</div>
