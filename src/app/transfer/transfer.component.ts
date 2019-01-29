@@ -88,11 +88,11 @@ export class TransferComponent implements OnInit, OnDestroy {
 
         // transfer
         try {
-          const tx: any = await this._bs.transferToken(this.toAdress, this.tokenId, 0);
+          const res: any = await this._bs.transferToken(this.toAdress, this.tokenId, 0);
 
-          console.log('transfer token tx', tx);
+          console.log('transfer token res', res);
           this.isLoading = false;
-          this.txHash = tx;
+          this.txHash = res.transactionHash;
 
           // remove the sent token id
           this.tokens.splice(this.tokenIdIdx, 1);

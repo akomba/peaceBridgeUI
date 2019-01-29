@@ -84,13 +84,9 @@ export class ApproveComponent implements OnInit, OnDestroy {
 
           const result: any = await this._bs.custodianApprove(tokenId, nonce);
 
-           const custApprTxHash = result;
-          console.log('Transfer approved at tx: ' + custApprTxHash);
-
-           this.apprTxHash = custApprTxHash;
+           this.apprTxHash = result.transactionHash;
           this.isApproveFinished = true;
           this.isLoading = false;
-
           this.transfers = [];
 
         } catch (e) {

@@ -24,6 +24,7 @@ export class DepositComponent implements OnInit {
 
     async ngOnInit() {
       this.isLoading = true;
+      this.errorMessage = '';
       this.loaderMessage = 'Connecting to network';
 
       const connectedNetwork = await this._bs.getConnectedNetwork();
@@ -44,14 +45,19 @@ export class DepositComponent implements OnInit {
     public async deposit(index: number) {
 
       this.isLoading = true;
-
+      this.errorMessage = '';
       this.loaderMessage = 'Depositing in progress';
-      const depositResult: any = await this._bs.depositToken(this.mintedTokensFiltered[index].tokenId,
-                                                        this.mintedTokensFiltered[index].minter,
-                                                        this.mintedTokensFiltered[index].amount);
-
-      this.transactionHash = depositResult;
-      this.isLoading = false;
+      try {
+        const depositResult: any = await this._bs.depositToken(this.mintedTokensFiltered[index].tokenId,
+                                                          this.mintedTokensFiltered[index].minter,
+                                                          this.mintedTokensFiltered[index].amount);
+        this.transactionHash = depositResult.transactionHash;
+        this.isLoading = false;
+      } catch (e) {
+        console.log('error', e.message);
+        this.errorMessage = e.message;
+        this.isLoading = false;
+      }
     }
 
     private async getMintedTokens() {

@@ -2,17 +2,6 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import { Router } from '@angular/router';
 import { BridgeService} from '../util/bridge.service';
 
-
-
-const promisify = (inner) =>
-  new Promise((resolve, reject) =>
-    inner((err, res) => {
-      if (err) { reject(err); }
-
-      resolve(res);
-    })
-  );
-
 @Component({
   selector: 'app-mint',
   templateUrl: './mint.component.html',
@@ -49,50 +38,20 @@ export class MintComponent implements OnInit {
 
     public async mint() {
       this.mintedTokenId = '';
-
-      let txHash = null;
-
+      this.errorMessage = '';
+      let result = null;
       this.loaderMessage = 'Minting in progress';
       this.isLoading = true;
-
       try {
-        txHash = await this._bs.mintToken(this.amountToMint);
+        result = await this._bs.mintToken(this.amountToMint);
+
+        this.mintedTokenId = this._bs.toHex(result.events.Mint.returnValues.tokenId);
+        this.isMintingFinished = true;
+        this.isLoading = false;
       } catch (e) {
         console.log('error', e.message);
+        this.errorMessage = e.message;
         this.isLoading = false;
-        return;
       }
-
-      this.loaderMessage = 'Wainting for tx receipt';
-
-      let tokenId: string = null;
-
-      try {
-        tokenId = await this.getTokenId(txHash);
-      } catch (e) {
-        console.log('error', e.message);
-        this.isLoading = false;
-        return;
-      }
-
-      this.mintedTokenId = tokenId;
-      this.isMintingFinished = true;
-      this.isLoading = false;
-    }
-
-    private async getTokenId(hash: any) {
-      let receipt = null;
-      try {
-        receipt = await this._bs.getW3TxReceipt(hash);
-      } catch (e) {
-        console.log('error:', e.message);
-      }
-      if (receipt === null) {
-        const delay = new Promise(resolve => setTimeout(resolve, 300));
-        await delay;
-        return await this.getTokenId(hash);
-      }
-      const tokenId = receipt['logs'][0]['topics'][3];
-      return tokenId;
     }
 }

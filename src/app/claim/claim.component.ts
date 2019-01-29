@@ -33,19 +33,19 @@ export class ClaimComponent implements OnInit {
 
     public async claim() {
       this.transactionHash = '';
+      this.errorMessage = '';
 
       this.loaderMessage = 'Claim in progress';
       this.isLoading = true;
 
       try {
         const result = await this._bs.claim(this.tokenId);
-        this.transactionHash =  result.toString();
+        this.transactionHash =  result.transactionHash;
+        this.isLoading = false;
       } catch (e) {
+        this.errorMessage = e.message;
         this.isLoading = false;
       }
-
-
-      this.isLoading = false;
     }
 }
 

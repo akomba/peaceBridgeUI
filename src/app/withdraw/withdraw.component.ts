@@ -63,6 +63,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
         // getting the token id from approve
         const res: any = await this._bs.getW3TxReceipt(this.custApproveTxHash/* , FOREIGN_NTW */);
+        console.log('res', res);
         this.tokenId = res.logs[0].topics[3];
         console.log('TOKEN ID', this.tokenId);
 
@@ -74,10 +75,19 @@ export class WithdrawComponent implements OnInit, OnDestroy {
           throw ({message: 'No transfer tx hash found.'});
         }
 
+        // TODO: check if the withdrawer is own THAT token
+
+
+
+
+
+
+
+
         const tx: any = await this._bs.withdraw(this.tokenId);
 
 
-        this.withdrawTxHash = tx;
+        this.withdrawTxHash = tx.transactionHash;
 
         const rawTransferFrom = await this._bs.generateRawTxAndMsgHash(this.transferTxHash);
         const rawCustodianApprove = await this._bs.generateRawTxAndMsgHash(this.custApproveTxHash);
@@ -126,12 +136,16 @@ export class WithdrawComponent implements OnInit, OnDestroy {
       this.tokenId = localStorage.getItem('tokenId');
 
       this.loaderMessage = 'Withdraw on deposit contract';
-
-      const result = await this._bs.withdrawOnDepositContract(toAddress, this.tokenId, withdrawArgs.bytes32Bundle, withdrawArgs.txLengths, withdrawArgs.txMsgHashes, 1,  amt);
-
-      this.resultHash = result;
-      this.isLoading = false;
-      localStorage.clear();
+      let result = null;
+      try {
+          result = await this._bs.withdrawOnDepositContract(toAddress, this.tokenId, withdrawArgs.bytes32Bundle, withdrawArgs.txLengths, withdrawArgs.txMsgHashes, 1,  amt);
+          this.resultHash = result.transactionHash;
+          this.isLoading = false;
+        } catch (e) {
+        this.isLoading = false;
+        this.errorMessage = e.message;
+        console.log('ERROR', e);
+      }
     }
 
     private async waitForNetwork(targetNetwork: string ) {

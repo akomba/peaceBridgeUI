@@ -2,6 +2,13 @@
   <div class="col-md-12">
     <h1 class="display-4 text-center">Mint</h1>
   </div>
+
+  <div  *ngIf="errorMessage" class="col-md-12 text-center mt-3">
+    <ngb-alert [type]="'danger'" [dismissible]="false">
+        <strong>Error!</strong> {{errorMessage}}
+    </ngb-alert>
+  </div>
+
   <div class="col-md-12 mt-3">
     <div class="form-group mt-3">
       <label for="depositAmount">Mint amount</label>

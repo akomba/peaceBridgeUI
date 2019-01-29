@@ -12,6 +12,12 @@
     </div>
   </div>
 
+  <div  *ngIf="errorMessage" class="col-md-12 text-center mt-3">
+    <ngb-alert [type]="'danger'" [dismissible]="false">
+        <strong>Error!</strong> {{errorMessage}}
+    </ngb-alert>
+  </div>
+
   <div *ngIf="transactionHash" class="col-md-12 mt-3">
     <p><span><b>tx hash:</b> <a href="https://ropsten.etherscan.io/tx/{{transactionHash}}">{{transactionHash}}</a></span></p>
   </div>

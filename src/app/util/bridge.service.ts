@@ -26,15 +26,6 @@ export const gasPerChallenge = 206250;
 export const gasPrice = 10000000000;
 
 
-const promisify = (inner: any) =>
-  new Promise((resolve, reject) =>
-    inner((err: any, res: any) => {
-      if (err) { reject(err); }
-
-      resolve(res);
-    })
-  );
-
 
 @Injectable()
 export class BridgeService {
@@ -89,30 +80,28 @@ export class BridgeService {
       }
   }
 
-  public mintToken (amount) {
+  public mintToken (amount: any) {
     if (this.selectedAddress !== '') {
-      return promisify(cb => this.tokenContractWeb3.methods.mint(amount, this.selectedAddress).send({from: this.selectedAddress }, cb));
+      return this.tokenContractWeb3.methods.mint(amount, this.selectedAddress).send({from: this.selectedAddress });
     } else {
       throw ({message: 'No address found.'});
     }
   }
 
   public depositToken (tokenId: string, minterAddress: string, amount: string) {
-    return promisify(cb => this.depositContractWeb3.methods.deposit(
-      tokenId, minterAddress).send({from: this.selectedAddress, value: amount }, cb));
+    return this.depositContractWeb3.methods.deposit(tokenId, minterAddress).send({from: this.selectedAddress, value: amount });
   }
 
   public transferToken(toAdress, tokenId, declaredNonce) {
-    return promisify(cb => this.tokenContractWeb3.methods.transferFrom(
-      this.selectedAddress, toAdress, tokenId, declaredNonce).send({from: this.selectedAddress}, cb));
+    return this.tokenContractWeb3.methods.transferFrom(this.selectedAddress, toAdress, tokenId, declaredNonce).send({from: this.selectedAddress});
   }
 
   public custodianApprove(tokenId: string, nonce: any) {
-    return promisify(cb => this.tokenContractWeb3.methods.custodianApprove(tokenId, nonce).send({from: this.selectedAddress}, cb));
+    return this.tokenContractWeb3.methods.custodianApprove(tokenId, nonce).send({from: this.selectedAddress});
   }
 
   public withdraw(tokenId: string) {
-    return promisify(cb => this.tokenContractWeb3.methods.withdraw(tokenId).send({from: this.selectedAddress}, cb));
+    return this.tokenContractWeb3.methods.withdraw(tokenId).send({from: this.selectedAddress});
   }
 
   public withdrawOnDepositContract(
@@ -124,42 +113,41 @@ export class BridgeService {
     nonce: number,
     amount: number ) {
 
-    return promisify(cb => this.depositContractWeb3.methods.withdraw(
+    return this.depositContractWeb3.methods.withdraw(
       to,
       tokenId,
       bytes32Bundle,
       txLengths,
       txMsgHashes,
-      nonce).send({from: this.selectedAddress, value: amount, gas: 8000000 }, cb));
-  }
+      nonce).send({from: this.selectedAddress, value: amount, gas: 8000000 });
+}
 
   public claim (tokenId: string) {
-    return promisify(cb => this.depositContractWeb3.methods.claim(tokenId).send({from: this.selectedAddress}, cb));
+    return this.depositContractWeb3.methods.claim(tokenId).send({from: this.selectedAddress});
   }
 
 
   public challenge (tokenId: string, challengeArgs: any, challengeType: string) {
+
+
     if (challengeType === 'past') {
-      return promisify(cb => this.depositContractWeb3.methods.initiateChallengeWithPastCustody(
+      return this.depositContractWeb3.methods.initiateChallengeWithPastCustody(
         this.selectedAddress,
         tokenId,
         challengeArgs.bytes32Bundle,
         challengeArgs.txLengths,
-        challengeArgs.txMsgHashes,
-        {gasPrice: gasPrice, value: gasPrice * gasPerChallenge * 4})
-        .send({from: this.selectedAddress}, cb));
+        challengeArgs.txMsgHashes)
+        .send({from: this.selectedAddress, gasPrice: gasPrice, value: gasPrice * gasPerChallenge * 4});
       } else {
-        return promisify(cb => this.depositContractWeb3.methods.challengeWithFutureCustody(
+        return this.depositContractWeb3.methods.challengeWithFutureCustody(
           this.selectedAddress,
           tokenId,
           challengeArgs.bytes32Bundle,
           challengeArgs.txLengths,
           challengeArgs.txMsgHashes)
-          .send({from: this.selectedAddress}, cb));
+          .send({from: this.selectedAddress});
       }
   }
-
-
 
 
 
@@ -185,8 +173,21 @@ export class BridgeService {
     return this.connectedNetwork;
   }
 
-  public async getW3TxReceipt(txHash: string) {
-      return promisify( cb => this.web3.eth.getTransactionReceipt(txHash, cb));
+  public async getW3TxReceipt(txHash: any) {
+      return this.web3.eth.getTransactionReceipt(txHash);
+  }
+
+  public async waitForW3TxReceipt(txHash: any) {
+      const receipt = await this.getW3TxReceipt(txHash);
+      if (receipt === null) {
+        const delay = new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('no receipt, waiting...');
+        await delay;
+        return await this.waitForW3TxReceipt(txHash);
+      } else {
+        console.log('receipt', receipt);
+        return receipt;
+      }
   }
 
   public getCurrentAddress() {
@@ -244,9 +245,8 @@ export class BridgeService {
   }
 
   public async generateRawTxAndMsgHash (_txHash) {
-
     const tx = await this.web3.eth.getTransaction(_txHash);
-
+    console.log('BS: tx', tx);
     // wait for tx
     if (tx === null) {
       const delay = new Promise(resolve => setTimeout(resolve, 300));
@@ -322,6 +322,10 @@ export class BridgeService {
     });
     const bytes32Bundle = this.txsToBytes32BundleArr(bundleArr);
     return {bytes32Bundle: bytes32Bundle, txLengths: txLengths, txMsgHashes: txMsgHashes};
+  }
+
+  public toHex (value: string) {
+    return this.web3.utils.toHex(value);
   }
 
   private txsToBytes32BundleArr(rawTxStringArr) {
