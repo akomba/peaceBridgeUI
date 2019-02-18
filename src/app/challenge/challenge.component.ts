@@ -17,6 +17,7 @@ export class ChallengeComponent implements OnInit {
     public  tokenId: string;
 
     public withdrawals: any[] = [];
+    public challenges: any[] = [];
 
     public loaderMessage = '';
     public transactionHash = '';
@@ -39,7 +40,24 @@ export class ChallengeComponent implements OnInit {
 
       const time = localStorage.getItem('challengeTime');
       const now = new Date().getTime();
-      if (time !== null && now - parseInt(time, 10) < expirationTime ) {
+
+      if (connectedNetwork !== 'ropsten') {
+        this.loaderMessage = 'Please connect to the home netwok!';
+      } else {
+        if (time !== null && now - parseInt(time, 10) < expirationTime ) {
+          this.doChallenge();
+        } else {
+          await this.getWithdrawals();
+          await this.getPendingChallenges();
+
+          this.isLoading = false;
+        }
+
+      }
+
+
+
+   /*    if (time !== null && now - parseInt(time, 10) < expirationTime ) {
         this.isLoading = true;
         if (connectedNetwork !== 'ropsten') {
           this.loaderMessage = 'Please connect to the home netwok!';
@@ -54,12 +72,17 @@ export class ChallengeComponent implements OnInit {
           this.isLoading = false;
           this.getWithdrawals();
         }
-      }
+      } */
+
     }
 
     public async getWithdrawals() {
       this.withdrawals = await this._bs.getWithdrawalEventsFromDepositContract(1);
       console.log('withdrawals', this.withdrawals);
+    }
+    public async getPendingChallenges() {
+      this.challenges = await this._bs.getChallengeInitiatedEventsFromDepositContract(1);
+      console.log('Challenges---', this.challenges);
     }
 
     public openModal(idx: number) {
@@ -97,6 +120,9 @@ export class ChallengeComponent implements OnInit {
         localStorage.setItem('challengeTime', new Date().getTime().toString());
 
         await this.waitForNetwork('ropsten');
+
+        this.doChallenge();
+
       }
     }
 

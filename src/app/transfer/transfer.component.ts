@@ -88,7 +88,14 @@ export class TransferComponent implements OnInit, OnDestroy {
 
         // transfer
         try {
-          const res: any = await this._bs.transferToken(this.toAdress, this.tokenId, 0);
+
+          if (this.toAdress.toLowerCase() === this._bs.getCurrentAddress().toLowerCase()) {
+            throw({message: 'You can\'t send tokens to yourself'});
+          }
+
+          const txNonce = await this._bs.getTransferNonce(this.tokenId);
+
+          const res: any = await this._bs.transferToken(this.toAdress, this.tokenId, txNonce);
 
           console.log('transfer token res', res);
           this.isLoading = false;
@@ -104,10 +111,14 @@ export class TransferComponent implements OnInit, OnDestroy {
         }
     }
 
-    private comparer(otherArray) {
-      return function(current) {
-        return otherArray.filter(function(other) {
-          return other === current;
+    private comparer(otherArray: any) {
+      return function(current: any) {
+        return otherArray.filter(function(other: string, idx: number , arr: any) {
+          if (other === current) {
+            delete arr[idx];
+            return true;
+          }
+          return false;
         }).length === 0;
       };
     }

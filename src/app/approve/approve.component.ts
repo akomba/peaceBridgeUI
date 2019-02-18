@@ -62,9 +62,10 @@ export class ApproveComponent implements OnInit, OnDestroy {
         }
       }
 
-      this.transfers = tr.filter(this.comparer(t));
 
+      this.transfers = tr.filter(this.comparer(t));
       console.log('transfers', this.transfers);
+
 
       this.isLoading = false;
     }
@@ -101,14 +102,23 @@ export class ApproveComponent implements OnInit, OnDestroy {
         blockNumber: resItem.blockNumber,
         from: resItem.topics[1],
         to: resItem.topics[2],
-        tokenId: resItem.topics[3]
+        tokenId: resItem.topics[3],
+        nonce: (resItem.data.length > 3) ? parseInt(resItem.data.slice(0, 66), 16) : 0
       };
     }
 
     private comparer(otherArray) {
       return function(current) {
         return otherArray.filter(function(other) {
-          return other.tokenId === current.tokenId;
+          return other.tokenId === current.tokenId  && other.blockNumber > current.blockNumber;
+        }).length === 0;
+      };
+    }
+
+    private highestNonce(otherArray) {
+      return function(current) {
+        return otherArray.filter(function(other) {
+          return other.tokenId === current.tokenId && other.nonce > current.nonce;
         }).length === 0;
       };
     }

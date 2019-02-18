@@ -45,6 +45,22 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         if (connectedNetwork !== 'kovan') {
           this.isLoading = true;
           this.loaderMessage = 'Please connect to the foreign netwok!';
+        } else {
+
+          const address = this._bs.getCurrentAddress().toLowerCase();
+          const transfers = await this._bs.getTransferEventsFromTokenContract(1);
+
+          // collect the incoming transfers
+          let t: any [] = [];
+          console.log(transfers);
+          const addr = this._bs.getCurrentAddress().toLowerCase();
+          for (let i = 0; i < transfers.length; i++) {
+            if ('0x' + transfers[i].topics[2].slice(26) === addr &&
+            transfers[i].topics[1] !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+              t.push(transfers[i]);
+            }
+          }
+          console.log(t);
         }
       }
     }
@@ -63,6 +79,10 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
         // getting the token id from approve
         const res: any = await this._bs.getW3TxReceipt(this.custApproveTxHash/* , FOREIGN_NTW */);
+        if (res === null) {
+          throw({message: 'Transaction not found'});
+        }
+
         console.log('res', res);
         this.tokenId = res.logs[0].topics[3];
         console.log('TOKEN ID', this.tokenId);
@@ -105,6 +125,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
       } catch (e) {
         console.log('ERROR::', e);
+        this.errorMessage = e.message;
         this.isLoading = false;
       }
     }

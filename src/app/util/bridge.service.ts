@@ -129,6 +129,41 @@ export class BridgeService {
 
   public challenge (tokenId: string, challengeArgs: any, challengeType: string) {
 
+    switch (challengeType) {
+
+      case 'past': {
+        return this.depositContractWeb3.methods.initiateChallengeWithPastCustody(
+          this.selectedAddress,
+          tokenId,
+          challengeArgs.bytes32Bundle,
+          challengeArgs.txLengths,
+          challengeArgs.txMsgHashes)
+          .send({from: this.selectedAddress, gasPrice: gasPrice, value: gasPrice * gasPerChallenge * 4});
+      }
+      case 'chain': {
+        return this.depositContractWeb3.methods.challengeWithPastCustody(
+          this.selectedAddress,
+          tokenId,
+          challengeArgs.bytes32Bundle,
+          challengeArgs.txLengths,
+          challengeArgs.txMsgHashes)
+          .send({from: this.selectedAddress});
+        break;
+      }
+      case 'future': {
+        return this.depositContractWeb3.methods.challengeWithFutureCustody(
+          this.selectedAddress,
+          tokenId,
+          challengeArgs.bytes32Bundle,
+          challengeArgs.txLengths,
+          challengeArgs.txMsgHashes)
+          .send({from: this.selectedAddress});
+      }
+
+
+    }
+
+
 
     if (challengeType === 'past') {
       return this.depositContractWeb3.methods.initiateChallengeWithPastCustody(
@@ -203,27 +238,29 @@ export class BridgeService {
 
   public async getMintEventsFromTokenContract(startBlock?: number) {
     return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, this.tokenContractWeb3.events.Mint().options.params.topics[0], (startBlock) ? startBlock : null );
-
-
   }
 
   public async getDepositEventsFromDepositContract(startBlock?: number) {
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, this.depositContractWeb3.events.Deposit().options.params.topics[0], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.web3, depositContractAddr, this.depositContractWeb3.events.Deposit().options.params.topics[0], (startBlock) ? startBlock : null );
+  }
+
+  public async getChallengeInitiatedEventsFromDepositContract(startBlock?: number) {
+    return this.getW3EventLog(this.web3, depositContractAddr, this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0], (startBlock) ? startBlock : null );
   }
 
   public async getTransferEventsFromTokenContract(startBlock?: number) {
-
     return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, this.tokenContractWeb3.events.Transfer().options.params.topics[0], (startBlock) ? startBlock : null );
   }
 
   public async getWithdrawalEventsFromDepositContract(startBlock?: number) {
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, this.depositContractWeb3.events.Withdrawal().options.params.topics[0], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.web3, depositContractAddr, this.depositContractWeb3.events.Withdrawal().options.params.topics[0], (startBlock) ? startBlock : null );
   }
 
 
    public async getW3EventLog(w3, contractAddress, topic, startBlock?) {
+     console.log('web3', w3);
     if (startBlock === null) {
-      const lastBlock = await this.web3.eth.getBlockNumber();
+      const lastBlock = await w3.eth.getBlockNumber();
       startBlock = lastBlock - queryRange;
       if (startBlock < 0) {
         startBlock = 0;
@@ -236,12 +273,19 @@ export class BridgeService {
       toBlock: 'latest',
       topics: [topic]
     };
+
+    console. log(filter);
+
     return w3.eth.getPastLogs(filter);
   }
 
   public async getNonceFromTransferRequest (txHash) {
     const transactionReceipt = await this.getW3TxReceipt(txHash);
-    return transactionReceipt['logs'][0]['data'][65];
+    return parseInt(transactionReceipt['logs'][0]['data'].slice(0, 66), 16);
+  }
+
+  public getTransferNonce(tokenId) {
+    return this.tokenContractWeb3.methods.transferNonce(tokenId).call();
   }
 
   public async generateRawTxAndMsgHash (_txHash) {
