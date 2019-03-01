@@ -28,23 +28,11 @@
     </ngb-alert>
   </div>
 
-  <div *ngIf="txHash != ''" class="col-md-12 mt-3">
-    <p><b>tx hash:</b> <a href="https://kovan.etherscan.io/tx/{{txHash}}">{{txHash}}</a></p>
+  <div *ngIf="txHash != ''" class="col-md-12 mt-3 text-center">
+    <ngb-alert [type]="'success'" [dismissible]="false">
+      <b>tx hash:</b> {{txHash}} <a href="https://kovan.etherscan.io/tx/{{txHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+    </ngb-alert>
   </div>
-
-<!--   <div class="col-md-12">
-    <h3 class="text-center">Previous transfers requests</h3>
-    <ul class="list-group transactions">
-      <li *ngFor="let t of transfers" class="list-group-item">
-          <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
-          <span class="from-address"><b>from:</b> 0x{{t.topics[1] | slice:26}}</span>
-          <span class="to-address"><b>to:</b> 0x{{t.topics[2] | slice:26}}</span>
-          <span class="token-id"><b>token id:</b> {{t.topics[3]}}</span>
-      </li>
-    </ul>
-  </div>
- -->
-
 </div>
 
 <div *ngIf="isLoading" id="loader-spinner" class="load-indicator" >

@@ -30,3 +30,22 @@
     padding-top: 50px;
     color: #444;
 }
+
+/* .transactions .list-group-item {
+  position: relative;
+}
+
+.transactions .list-group-item button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+
+
+@media (max-width: 576px) {
+  .transactions .list-group-item button {
+    position: relative;
+  }
+}
+ */

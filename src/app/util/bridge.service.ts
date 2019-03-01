@@ -13,9 +13,11 @@ const queryRange = 50000; // in blocks...
 const foreignNetwork = 'kovan';
 const homeNetwork = 'ropsten'; */
 
-const tokenContractAddr = '0x366021610bF0D5EbfdC9041a7f8b152aa76E6D98';
-const depositContractAddr = '0xcBB5AeF36f6cde3e046c64EB2149BFFB59b8EFFf';
+// const tokenContractAddr = '0x366021610bF0D5EbfdC9041a7f8b152aa76E6D98';
+const tokenContractAddr = '0x56B9FB11D63FCb0EB1c36F51035A38B184901C12';
 
+//    const depositContractAddr = '0xcBB5AeF36f6cde3e046c64EB2149BFFB59b8EFFf';
+const depositContractAddr = '0xA292830F2b150C13a76c8140112346439a28bda1';
 
 declare var require: any;
 declare let window: any;
@@ -126,7 +128,6 @@ export class BridgeService {
     return this.depositContractWeb3.methods.claim(tokenId).send({from: this.selectedAddress});
   }
 
-
   public challenge (tokenId: string, challengeArgs: any, challengeType: string) {
 
     switch (challengeType) {
@@ -140,7 +141,7 @@ export class BridgeService {
           challengeArgs.txMsgHashes)
           .send({from: this.selectedAddress, gasPrice: gasPrice, value: gasPrice * gasPerChallenge * 4});
       }
-      case 'chain': {
+      case 'response': {
         return this.depositContractWeb3.methods.challengeWithPastCustody(
           this.selectedAddress,
           tokenId,
@@ -183,10 +184,6 @@ export class BridgeService {
           .send({from: this.selectedAddress});
       }
   }
-
-
-
-
 
   public getW3TokenContract() {
     return this.tokenContractWeb3;
@@ -232,6 +229,10 @@ export class BridgeService {
     return '....';
   }
 
+  public getBalanceForCurrentAccount() {
+    return this.web3.eth.getBalance(this.selectedAddress);
+  }
+
   public async getTransferRequestEventsFromTokenContract(startBlock?: number) {
     return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, this.tokenContractWeb3.events.TransferRequest().options.params.topics[0], (startBlock) ? startBlock : null );
   }
@@ -256,9 +257,7 @@ export class BridgeService {
     return this.getW3EventLog(this.web3, depositContractAddr, this.depositContractWeb3.events.Withdrawal().options.params.topics[0], (startBlock) ? startBlock : null );
   }
 
-
-   public async getW3EventLog(w3, contractAddress, topic, startBlock?) {
-     console.log('web3', w3);
+  public async getW3EventLog(w3, contractAddress, topic, startBlock?) {
     if (startBlock === null) {
       const lastBlock = await w3.eth.getBlockNumber();
       startBlock = lastBlock - queryRange;
@@ -273,9 +272,6 @@ export class BridgeService {
       toBlock: 'latest',
       topics: [topic]
     };
-
-    console. log(filter);
-
     return w3.eth.getPastLogs(filter);
   }
 

@@ -1,0 +1,34 @@
+ul.transactions span{
+  display: block;
+}
+
+/* latest block to the top */
+.list-group {
+  flex-direction: column-reverse;
+}
+
+
+#challenge-input{
+  position: fixed;
+  background:rgba(0,0,0,0.8);
+  z-index:999999990;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+#challenge-input .modal-body{
+  position: relative;
+  background-color: white;
+  border-radius: 6px;
+  padding-top: 50px;
+  color: #444;
+}
+
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}

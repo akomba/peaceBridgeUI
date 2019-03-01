@@ -9,6 +9,9 @@ import { WithdrawComponent } from './withdraw/withdraw.component';
 import { ClaimComponent } from './claim/claim.component';
 import { ChallengeComponent } from './challenge/challenge.component';
 
+import { FraudComponent } from './fraud/fraud.component';
+
+
 const routes: Routes = [
 { path: '', component: MintComponent, pathMatch: 'full' },
 { path: 'mint', component: MintComponent },
@@ -20,6 +23,7 @@ const routes: Routes = [
 { path: 'claim', component: ClaimComponent},
 { path: 'claim/:tokenId', component: ClaimComponent},
 { path: 'challenge', component: ChallengeComponent},
+{ path: 'test', component: FraudComponent}, // for testing... on this page you can do some fraud stuff
 { path: '**', component: NotFound404Component }];
 
 @NgModule({

@@ -19,6 +19,7 @@ export class MintComponent implements OnInit {
 
     public isMintingFinished = false;
     public mintedTokenId = '';
+    public txHash = '';
 
     constructor(public _bs: BridgeService, private _router: Router) {}
 
@@ -41,11 +42,13 @@ export class MintComponent implements OnInit {
       this.errorMessage = '';
       let result = null;
       this.loaderMessage = 'Minting in progress';
+      this.isMintingFinished = false;
       this.isLoading = true;
       try {
         result = await this._bs.mintToken(this.amountToMint);
-
+        console.log('res', result);
         this.mintedTokenId = this._bs.toHex(result.events.Mint.returnValues.tokenId);
+        this.txHash = result.transactionHash;
         this.isMintingFinished = true;
         this.isLoading = false;
       } catch (e) {

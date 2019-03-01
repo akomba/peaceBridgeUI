@@ -12,10 +12,21 @@
   <div *ngIf="transactionHash==''" class="col-md-12">
     <ul class="list-group transactions">
       <li *ngFor="let t of mintedTokensFiltered; let i = index" class="list-group-item">
-          <span class="token-id"><b>token id:</b> {{t.tokenId}}</span>
-          <span class="amount"><b>amount:</b> {{t.amount}}</span>
-          <span class="minter-address"><b>minter:</b> {{t.minter}}</span>
-          <button (click)="deposit(i)">Deposit</button>
+
+          <div class="row">
+            <div class="col-md-3">
+              <span class="token-id" ngbTooltip="{{t.tokenId}}"><b>token id:</b> {{t.tokenId | hashShortener:6}}</span>
+            </div>
+            <div class="col-md-3">
+              <span class="amount"><b>amount:</b> {{t.amount}}</span>
+            </div>
+            <div class="col-md-3">
+              <span class="minter-address" ngbTooltip="{{t.minter}}"><b>minter:</b> {{t.minter | hashShortener:4}}</span>
+            </div>
+            <div class="col-md-3 text-right">
+              <button class="btn btn-sm btn-primary" (click)="deposit(i)">Deposit</button>
+            </div>
+          </div>
       </li>
     </ul>
   </div>

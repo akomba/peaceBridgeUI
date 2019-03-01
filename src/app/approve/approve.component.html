@@ -14,19 +14,33 @@
     <h3 class="text-center">Transfers requests</h3>
     <ul class="list-group transactions">
       <li *ngFor="let t of transfers" class="list-group-item">
-          <span class="block-number"><b>txHash:</b> {{t.transferRequests}}</span>
-          <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
-          <span class="from-address"><b>from:</b> 0x{{t.from | slice:26}}</span>
-          <span class="to-address"><b>to:</b> 0x{{t.to | slice:26}}</span>
-          <span class="token-id"><b>token id:</b> {{t.tokenId}}</span>
-          <button (click)="approve(t.transferRequests, t.tokenId)">Approve</button>
+          <div class="row">
+            <div class="col-md">
+              <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
+              <span class="block-number" ngbTooltip="{{t.transferRequests}}"><b>txHash:</b> {{t.transferRequests | hashShortener:6}}</span>
+            </div>
+
+            <div class="col-md">
+              <span class="from-address" ngbTooltip="0x{{t.from | slice:26}}"><b>from:</b> 0x{{t.from | slice:26 | hashShortener:4}}</span>
+              <span class="to-address" ngbTooltip="0x{{t.to | slice:26}}"><b>to:</b> 0x{{t.to | slice:26 | hashShortener:4}}</span>
+            </div>
+            <div class="col-md">
+              <span class="token-id" ngbTooltip="{{t.tokenId}}"><b>token id:</b> {{t.tokenId | hashShortener:6}}</span>
+            </div>
+            <div class="col-md text-right">
+              <button class="btn btn-sm btn-primary" (click)="approve(t.transferRequests, t.tokenId)">Approve</button>
+            </div>
+          </div>
+
       </li>
     </ul>
   </div>
 </div>
 
-<div *ngIf="isApproveFinished" class="col-md-12 mt-3">
-    <p><span><b>custodian approval tx hash:</b> {{apprTxHash}}</span></p>
+<div *ngIf="isApproveFinished" class="col-md-12 mt-3 text-center">
+    <ngb-alert [type]="'success'" [dismissible]="false">
+      <b>Custodian approval tx hash:</b> {{apprTxHash}} <a href="https://kovan.etherscan.io/tx/{{apprTxHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+    </ngb-alert>
 </div>
 
 

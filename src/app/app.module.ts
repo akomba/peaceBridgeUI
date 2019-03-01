@@ -14,6 +14,7 @@ import { ClaimModule } from './claim/claim.module';
 import { ChallengeModule } from './challenge/challenge.module';
 import { NotFound404Component } from './not-found404.component';
 import { SharedModule } from './util/shared.module';
+import { FraudModule } from './fraud/fraud.module';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,9 @@ import { SharedModule } from './util/shared.module';
     ApproveModule,
     WithdrawModule,
     ClaimModule,
-    ChallengeModule
+    ChallengeModule,
+
+    FraudModule
   ],
   providers: [],
   bootstrap: [AppComponent]

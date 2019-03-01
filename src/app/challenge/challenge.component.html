@@ -19,7 +19,7 @@
                 <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
                 <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
                 <span class="token-id"><b>token id:</b> {{t.topics[2]}}</span>
-                <button  (click)="openModal(i)"> Challenge this</button>
+                <button  (click)="openModal(i, false)"> Challenge this</button>
             </li>
           </ul>
         </div>
@@ -37,7 +37,7 @@
               <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
               <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
               <span class="token-id"><b>token id:</b> {{t.data}}</span>
-              <button (click)="openModal(i)">Send proof of custody</button>
+              <button (click)="openModal(i, true)">Send proof of custody</button>
           </li>
         </ul>
       </ng-template>
@@ -72,12 +72,14 @@
       <input type="text" class="form-control" id="approvalTx" name="approvalTx" placeholder="0x000...000" [(ngModel)]="approvalTxHash">
     </div>
 
-    <label class="form-check-inline">
+    <div *ngIf="isResponse == false">
+      <label class="form-check-inline">
         <input class="form-check-input" type="radio" name="type" value="past" [(ngModel)]="challengeType"> With past custody
-    </label>
-    <label class="form-check-inline">
+      </label>
+      <label class="form-check-inline">
         <input class="form-check-input" type="radio" name="type" value="future" [(ngModel)]="challengeType"> With future custody
-    </label>
+      </label>
+    </div>
 
 
     <div class="text-center">
