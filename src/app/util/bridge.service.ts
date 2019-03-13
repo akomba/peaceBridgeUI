@@ -45,7 +45,7 @@ export class BridgeService {
   // providers
   private web3: Web3 = null;
   private foreignWeb3: Web3 = null;
-  private homeWeb3: Web3 = null;
+  // private homeWeb3: Web3 = null;
 
   constructor() {
     this.accountChange = new Subject<string>();
@@ -61,9 +61,8 @@ export class BridgeService {
         window.web3 = new Web3(window.ethereum);
         try {
             await window.ethereum.enable();
-            // TODO: Get accounts
         } catch (error) {
-            // User denied account access...
+            console.error(error);
         }
       }
 
@@ -71,8 +70,9 @@ export class BridgeService {
 
         this.web3 = new Web3(window.web3.currentProvider);
         this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
-        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
+        // this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
+        // watching account changes
         this.web3.currentProvider.publicConfigStore.on('update', (res) => {
           if (this.selectedAddress !== res.selectedAddress) {
             this.selectedAddress = res.selectedAddress;
@@ -80,18 +80,16 @@ export class BridgeService {
           }
         });
 
-
         this.tokenContractWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
         this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
 
         this.web3.eth.net.getNetworkType().then(ntwType => {
           this.connectedNetwork = ntwType;
         });
-
-
       }
   }
 
+  /* Contract functions */
   public mintToken (amount: any) {
     if (this.selectedAddress !== '') {
       return this.tokenContractWeb3.methods.mint(amount, this.selectedAddress).send({from: this.selectedAddress });
@@ -195,12 +193,15 @@ export class BridgeService {
       }
   }
 
-  public getW3TokenContract() {
+ /*  public getW3TokenContract() {
     return this.tokenContractWeb3;
-  }
-  public getW3DepositContract() {
+  } */
+  /* public getW3DepositContract() {
     return this.depositContractWeb3;
-  }
+  } */
+
+
+  /* Getters */
 
   public async getConnectedNetwork() {
     if (this.connectedNetwork === '') {
@@ -213,6 +214,17 @@ export class BridgeService {
 
   public getConnectedNetworkName() {
     return this.connectedNetwork;
+  }
+
+  public getCurrentAddress() {
+    if (this.selectedAddress !== '') {
+      return this.selectedAddress;
+    }
+    return '....';
+  }
+
+  public getBalanceForCurrentAccount() {
+    return this.web3.eth.getBalance(this.selectedAddress);
   }
 
   public async getW3TxReceipt(txHash: any) {
@@ -230,23 +242,26 @@ export class BridgeService {
       }
   }
 
-  public getCurrentAddress() {
-    if (this.selectedAddress !== '') {
-      return this.selectedAddress;
-    }
-    return '....';
+  public getBlock(blockNumber: string) {
+    return this.web3.eth.getBlock(blockNumber);
   }
 
-  public getBalanceForCurrentAccount() {
-    return this.web3.eth.getBalance(this.selectedAddress);
-  }
+
+  /* Event functions */
 
   public async getTransferRequestEventsFromTokenContract(startBlock?: number) {
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, this.tokenContractWeb3.events.TransferRequest().options.params.topics[0], (startBlock) ? startBlock : null );
+    const topic = this.foreignWeb3.utils.sha3('TransferRequest(address,address,uint256,uint256,bytes32)');
+    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
   }
 
   public async getMintEventsFromTokenContract(startBlock?: number) {
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, this.tokenContractWeb3.events.Mint().options.params.topics[0], (startBlock) ? startBlock : null );
+    const topic = this.foreignWeb3.utils.sha3('Mint(uint256,address,uint256,uint256)');
+    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
+  }
+
+  public async getTransferEventsFromTokenContract(startBlock?: number) {
+    const topic = this.foreignWeb3.utils.sha3('Transfer(address,address,uint256)');
+    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
   }
 
   public async getDepositEventsFromDepositContract(startBlock?: number) {
@@ -255,10 +270,6 @@ export class BridgeService {
 
   public async getChallengeInitiatedEventsFromDepositContract(startBlock?: number) {
     return this.getW3EventLog(this.web3, depositContractAddr, this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0], (startBlock) ? startBlock : null );
-  }
-
-  public async getTransferEventsFromTokenContract(startBlock?: number) {
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, this.tokenContractWeb3.events.Transfer().options.params.topics[0], (startBlock) ? startBlock : null );
   }
 
   public async getWithdrawalEventsFromDepositContract(startBlock?: number) {
@@ -296,6 +307,9 @@ export class BridgeService {
     return this.tokenContractWeb3.methods.ownerOf(tokenId).call();
   }
 
+
+
+  /* Utils */
   public async generateRawTxAndMsgHash (_txHash, onForeignNetwork = false) {
     let w3 = this.web3;
 
@@ -388,9 +402,6 @@ export class BridgeService {
     return this.web3.utils.toHex(value);
   }
 
-  public getBlock(blockNumber: string) {
-    return this.web3.eth.getBlock(blockNumber);
-  }
 
 
   private txsToBytes32BundleArr(rawTxStringArr) {
