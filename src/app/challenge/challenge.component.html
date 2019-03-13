@@ -13,33 +13,46 @@
     <ngb-tab title="Withdrawals">
       <ng-template ngbTabContent>
         <div *ngIf="transactionHash == ''" class="col-md-12">
-          <ul class="list-group transactions">
-            <li *ngFor="let t of withdrawals; let i = index" class="list-group-item">
-                <span class=""><b>txHash:</b> {{t.transactionHash}}</span>
-                <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
-                <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
-                <span class="token-id"><b>token id:</b> {{t.topics[2]}}</span>
-                <button  (click)="openModal(i, false)"> Challenge this</button>
-            </li>
-          </ul>
+          <div *ngIf="withdrawals.length > 0">
+            <ul class="list-group transactions">
+              <li *ngFor="let t of withdrawals; let i = index" class="list-group-item">
+                  <span class=""><b>txHash:</b> {{t.transactionHash}}</span>
+                  <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
+                  <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
+                  <span class="token-id"><b>token id:</b> {{t.topics[2]}}</span>
+                  <span class="token-id"><b>Challenge period ends at</b> {{t.challengeEnd | date:'short'}}</span>
+
+                  <button  (click)="openModal(i, false)"> Challenge this</button>
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="withdrawals.length == 0">
+              <p>No challengeable withdrawals found</p>
+            </div>
+
         </div>
 
         <div *ngIf="transactionHash != ''" class="col-md-12 mt-3">
-          <p><b>tx hash:</b> <a href="https://ropsten.etherscan.io/tx/{{resultHash}}">{{transactionHash}}</a></p>
+          <p><b>tx hash:</b> <a href="https://ropsten.etherscan.io/tx/{{transactionHash}}">{{transactionHash}}</a></p>
         </div>
       </ng-template>
     </ngb-tab>
     <ngb-tab title="Pending challenges">
       <ng-template ngbTabContent>
-        <ul class="list-group transactions">
-          <li *ngFor="let t of challenges; let i = index" class="list-group-item">
-              <span class=""><b>txHash:</b> {{t.transactionHash}}</span>
-              <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
-              <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
-              <span class="token-id"><b>token id:</b> {{t.data}}</span>
-              <button (click)="openModal(i, true)">Send proof of custody</button>
-          </li>
-        </ul>
+        <div *ngIf="challenges.length > 0">
+          <ul class="list-group transactions">
+            <li *ngFor="let t of challenges; let i = index" class="list-group-item">
+                <span class=""><b>txHash:</b> {{t.transactionHash}}</span>
+                <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
+                <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
+                <span class="token-id"><b>token id:</b> {{t.data}}</span>
+                <button (click)="openModal(i, true)">Send proof of custody</button>
+            </li>
+          </ul>
+        </div>
+        <div *ngIf="challenges.length == 0">
+          <p>No pending challenges found</p>
+        </div>
       </ng-template>
     </ngb-tab>
   </ngb-tabset>

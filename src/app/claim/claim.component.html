@@ -18,8 +18,10 @@
     </ngb-alert>
   </div>
 
-  <div *ngIf="transactionHash" class="col-md-12 mt-3">
-    <p><span><b>tx hash:</b> <a href="https://ropsten.etherscan.io/tx/{{transactionHash}}">{{transactionHash}}</a></span></p>
+  <div *ngIf="transactionHash != ''" class="col-md-12 mt-3 text-center">
+    <ngb-alert [type]="'success'" [dismissible]="false">
+      <b>tx hash:</b> {{transactionHash}} <a href="https://ropsten.etherscan.io/tx/{{transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+    </ngb-alert>
   </div>
 
 </div>

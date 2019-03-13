@@ -1,8 +1,9 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {BridgeService } from '../util/bridge.service';
 // import { ethers, Wallet } from 'ethers';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-transfer',
@@ -23,8 +24,9 @@ export class TransferComponent implements OnInit, OnDestroy {
     public txHash = '';
 
     private subscription: any;
+    private accountChangeRef: Subscription = null;
 
-    constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute) {
+    constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute, private zone: NgZone) {
     }
 
     async ngOnInit() {
@@ -52,8 +54,18 @@ export class TransferComponent implements OnInit, OnDestroy {
         return;
       }
 
+      this.accountChangeRef = this._bs.accountCast.subscribe( async () => {
+        this.zone.run(() => {
+          this.getTokenIds();
+          });
+      });
 
+      this.getTokenIds();
+    }
+
+    public async getTokenIds() {
       this.loaderMessage = 'Getting the tokenIds';
+      this.isLoading = true;
 
       const res = await this._bs.getTransferEventsFromTokenContract(1);
 
@@ -75,6 +87,7 @@ export class TransferComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         this.subscription.unsubscribe();
+        this.accountChangeRef.unsubscribe();
     }
 
     public async transfer() {
@@ -97,7 +110,6 @@ export class TransferComponent implements OnInit, OnDestroy {
 
           const res: any = await this._bs.transferToken(this.toAdress, this.tokenId, txNonce);
 
-          console.log('transfer token res', res);
           this.isLoading = false;
           this.txHash = res.transactionHash;
 
@@ -105,7 +117,6 @@ export class TransferComponent implements OnInit, OnDestroy {
           this.tokens.splice(this.tokenIdIdx, 1);
 
         } catch (e) {
-          console.log('ERROR', e);
           this.errorMessage = e.message;
           this.isLoading = false;
         }

@@ -45,8 +45,6 @@ export class ApproveComponent implements OnInit, OnDestroy {
     public async getTransfers() {
       const transferRequests: any[] = await this._bs.getTransferRequestEventsFromTokenContract(1);
       const transfers: any[] = await this._bs.getTransferEventsFromTokenContract(1);
-      console.log('transfers', transfers);
-      console.log('transfer requests', transferRequests);
 
       let tr: any[] = [];
       let t: any[] = [];
@@ -64,8 +62,6 @@ export class ApproveComponent implements OnInit, OnDestroy {
 
 
       this.transfers = tr.filter(this.comparer(t));
-      console.log('transfers', this.transfers);
-
 
       this.isLoading = false;
     }
@@ -79,7 +75,6 @@ export class ApproveComponent implements OnInit, OnDestroy {
         try {
 
           const nonce = await this._bs.getNonceFromTransferRequest(txHash);
-          console.log('Nonce:::', nonce);
 
           this.loaderMessage = 'Custodian approve call';
 

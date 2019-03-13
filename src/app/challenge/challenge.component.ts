@@ -57,19 +57,28 @@ export class ChallengeComponent implements OnInit {
     }
 
     public async getWithdrawals() {
-      this.withdrawals = await this._bs.getWithdrawalEventsFromDepositContract(1);
-      console.log('withdrawals', this.withdrawals);
+      const withdrawals = await this._bs.getWithdrawalEventsFromDepositContract(1);
+      let time = Date.now();
+      for (let i = 0; i < withdrawals.length; i++) {
+        let block = await this._bs.getBlock(withdrawals[i].blockNumber);
+        let challengeEnd = block.timestamp * 1000 + 600000; // 10 min
+
+
+        if ( challengeEnd > time) {
+          withdrawals[i].challengeEnd = challengeEnd;
+          this.withdrawals.push(withdrawals[i]);
+        }
+      }
+
     }
     public async getPendingChallenges() {
       this.challenges = await this._bs.getChallengeInitiatedEventsFromDepositContract(1);
-      console.log('Challenges---', this.challenges);
     }
 
     public openModal(idx: number, isResponse: boolean) {
       this.selectedIdx = idx;
       this.isResponse = isResponse;
       this.isChallengeActivated = true;
-      console.log('IDX: ', idx);
     }
 
     public closeModal() {
@@ -87,9 +96,9 @@ export class ChallengeComponent implements OnInit {
         this.isLoading = true;
         this.errorMessage = '';
 
-        const rawTransferFrom =  await this._bs.generateRawTxAndMsgHash(this.transferTxHash);
+        const rawTransferFrom =  await this._bs.generateRawTxAndMsgHash(this.transferTxHash, true); // use the foreign network
 
-        const rawCustodianApprove = await this._bs.generateRawTxAndMsgHash(this.approvalTxHash);
+        const rawCustodianApprove = await this._bs.generateRawTxAndMsgHash(this.approvalTxHash, true);
 
         const challengeArgs =  await this._bs.formBundleLengthsHashes([rawTransferFrom, rawCustodianApprove]);
 
@@ -101,10 +110,9 @@ export class ChallengeComponent implements OnInit {
         localStorage.setItem('challengeResponse', this.isResponse ? 'true' : 'false');
         localStorage.setItem('challengeTime', new Date().getTime().toString());
 
-        await this.waitForNetwork('ropsten');
+       // await this.waitForNetwork('ropsten');
 
         this.doChallenge();
-
       }
     }
 
@@ -122,18 +130,19 @@ export class ChallengeComponent implements OnInit {
       try {
 
         const res = await this._bs.challenge(tokenId, challengeArgs, challengeType);
-        console.log('res', res);
         this.transactionHash = res.transactionHash;
         this.isLoading = false;
         localStorage.clear();
 
         const newBalance = await this._bs.getBalanceForCurrentAccount();
 
-        if(newBalance > balance) {
+        if (newBalance > balance) {
           // challenge was succesful
         } else {
           // challenge failed
         }
+
+        this.closeModal();
 
       } catch (e) {
         this.errorMessage = e.message;

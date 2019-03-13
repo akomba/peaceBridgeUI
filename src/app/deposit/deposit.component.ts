@@ -1,6 +1,7 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { Router } from '@angular/router';
 import { BridgeService } from '../util/bridge.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-deposit',
@@ -8,7 +9,7 @@ import { BridgeService } from '../util/bridge.service';
   styleUrls: ['./deposit.component.css']
 })
 
-export class DepositComponent implements OnInit {
+export class DepositComponent implements OnInit, OnDestroy {
     public errorMessage = '';
     public products: any[];
 
@@ -20,13 +21,14 @@ export class DepositComponent implements OnInit {
     private mintedTokens: any[] = [];
     private depositedTokens: any[] = [];
 
-    constructor(public _bs: BridgeService, private _router: Router) {}
+    private accountChangeRef: Subscription = null;
+
+    constructor(public _bs: BridgeService, private _router: Router, private zone: NgZone) {}
 
     async ngOnInit() {
       this.isLoading = true;
       this.errorMessage = '';
       this.loaderMessage = 'Connecting to network';
-
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'ropsten') {
@@ -34,8 +36,28 @@ export class DepositComponent implements OnInit {
         return;
       }
 
-      this.loaderMessage = 'Getting the latest minted tokens';
+      this.getTokens();
 
+      this.accountChangeRef = this._bs.accountCast.subscribe( async () => {
+
+
+        this.zone.run(() => {
+          this.mintedTokensFiltered = null;
+          this.transactionHash = '';
+          this.getTokens();
+          });
+      });
+    }
+
+    ngOnDestroy() {
+      if (this.accountChangeRef) {
+        this.accountChangeRef.unsubscribe();
+      }
+    }
+
+    public async getTokens() {
+      this.loaderMessage = 'Getting the latest minted tokens';
+      this.isLoading = true;
       this.mintedTokens = await this.getMintedTokens();
       this.depositedTokens = await this.getDepositEvents();
       this.mintedTokensFiltered = this.mintedTokens.filter(this.comparer(this.depositedTokens));
@@ -54,7 +76,6 @@ export class DepositComponent implements OnInit {
         this.transactionHash = depositResult.transactionHash;
         this.isLoading = false;
       } catch (e) {
-        console.log('error', e.message);
         this.errorMessage = e.message;
         this.isLoading = false;
       }

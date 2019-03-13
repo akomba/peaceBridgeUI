@@ -46,13 +46,11 @@ export class MintComponent implements OnInit {
       this.isLoading = true;
       try {
         result = await this._bs.mintToken(this.amountToMint);
-        console.log('res', result);
         this.mintedTokenId = this._bs.toHex(result.events.Mint.returnValues.tokenId);
         this.txHash = result.transactionHash;
         this.isMintingFinished = true;
         this.isLoading = false;
       } catch (e) {
-        console.log('error', e.message);
         this.errorMessage = e.message;
         this.isLoading = false;
       }

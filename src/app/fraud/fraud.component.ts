@@ -16,13 +16,18 @@ export class FraudComponent implements OnInit {
     public isLoading = false;
     public loaderMessage = '';
 
+    public toAddress = '';
+    public tokenId = '';
+    public txHash = '';
+
     constructor(public _bs: BridgeService, private _router: Router) {}
 
     ngOnInit() {}
 
+    doFraudStuff() {
 
 
-
+    }
 
 }
 

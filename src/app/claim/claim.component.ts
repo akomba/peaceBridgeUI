@@ -39,6 +39,11 @@ export class ClaimComponent implements OnInit {
       this.isLoading = true;
 
       try {
+        const owner = await this._bs.getTokenOwner(this.tokenId);
+        if (owner.toLowerCase() !== this._bs.getCurrentAddress().toLowerCase()) {
+          throw({message: 'No token id found'});
+        }
+
         const result = await this._bs.claim(this.tokenId);
         this.transactionHash =  result.transactionHash;
         this.isLoading = false;

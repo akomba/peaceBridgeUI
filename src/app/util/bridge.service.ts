@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import Web3 from 'web3';
 import { contractAbis } from './abis';
+import { Subject, Observable } from 'rxjs';
 
 const EthereumTx: any = require('ethereumjs-tx');
 const Account: any = require('eth-lib/lib/account');
@@ -14,10 +15,10 @@ const foreignNetwork = 'kovan';
 const homeNetwork = 'ropsten'; */
 
 // const tokenContractAddr = '0x366021610bF0D5EbfdC9041a7f8b152aa76E6D98';
-const tokenContractAddr = '0x56B9FB11D63FCb0EB1c36F51035A38B184901C12';
+const tokenContractAddr = '0x8dB8D4B830Ab44E78e3Af51d43BF355535e7327C';
 
 //    const depositContractAddr = '0xcBB5AeF36f6cde3e046c64EB2149BFFB59b8EFFf';
-const depositContractAddr = '0xA292830F2b150C13a76c8140112346439a28bda1';
+const depositContractAddr = '0x226ab9E4eA11Ccf6e104A991AbF5c3a9340712cc';
 
 declare var require: any;
 declare let window: any;
@@ -28,9 +29,11 @@ export const gasPerChallenge = 206250;
 export const gasPrice = 10000000000;
 
 
-
 @Injectable()
 export class BridgeService {
+
+  public accountChange: Subject<string>;
+  public accountCast: Observable<string>;
 
   private tokenContractWeb3: any = null;
   private depositContractWeb3: any = null;
@@ -45,6 +48,9 @@ export class BridgeService {
   private homeWeb3: Web3 = null;
 
   constructor() {
+    this.accountChange = new Subject<string>();
+    this.accountCast = this.accountChange.asObservable();
+
     window.addEventListener('load', async (event) => {
       this.intBridge();
     });
@@ -62,22 +68,26 @@ export class BridgeService {
       }
 
       if (typeof window.web3 !== 'undefined') {
+
         this.web3 = new Web3(window.web3.currentProvider);
+        this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
+        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
         this.web3.currentProvider.publicConfigStore.on('update', (res) => {
-          this.selectedAddress = res.selectedAddress;
+          if (this.selectedAddress !== res.selectedAddress) {
+            this.selectedAddress = res.selectedAddress;
+            this.accountChange.next(this.selectedAddress);
+          }
         });
 
-        this.tokenContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
+
+        this.tokenContractWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
         this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
 
         this.web3.eth.net.getNetworkType().then(ntwType => {
           this.connectedNetwork = ntwType;
-         });
+        });
 
-
-         this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
-         this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
       }
   }
@@ -121,7 +131,7 @@ export class BridgeService {
       bytes32Bundle,
       txLengths,
       txMsgHashes,
-      nonce).send({from: this.selectedAddress, value: amount, gas: 8000000 });
+      nonce).send({from: this.selectedAddress, value: amount, gas: 8000000});
 }
 
   public claim (tokenId: string) {
@@ -213,11 +223,9 @@ export class BridgeService {
       const receipt = await this.getW3TxReceipt(txHash);
       if (receipt === null) {
         const delay = new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('no receipt, waiting...');
         await delay;
         return await this.waitForW3TxReceipt(txHash);
       } else {
-        console.log('receipt', receipt);
         return receipt;
       }
   }
@@ -284,14 +292,26 @@ export class BridgeService {
     return this.tokenContractWeb3.methods.transferNonce(tokenId).call();
   }
 
-  public async generateRawTxAndMsgHash (_txHash) {
-    const tx = await this.web3.eth.getTransaction(_txHash);
-    console.log('BS: tx', tx);
+  public getTokenOwner(tokenId: string) {
+    return this.tokenContractWeb3.methods.ownerOf(tokenId).call();
+  }
+
+  public async generateRawTxAndMsgHash (_txHash, onForeignNetwork = false) {
+    let w3 = this.web3;
+
+    if (onForeignNetwork === true) {
+      w3 = this.foreignWeb3;
+    } else {
+      onForeignNetwork = false;
+    }
+
+
+    const tx = await w3.eth.getTransaction(_txHash);
     // wait for tx
     if (tx === null) {
-      const delay = new Promise(resolve => setTimeout(resolve, 300));
+      const delay = new Promise(resolve => setTimeout(resolve, 2000));
       await delay;
-      return await this.generateRawTxAndMsgHash(_txHash);
+      return await this.generateRawTxAndMsgHash(_txHash, onForeignNetwork);
     }
 
     const txParams: any = {};
@@ -367,6 +387,11 @@ export class BridgeService {
   public toHex (value: string) {
     return this.web3.utils.toHex(value);
   }
+
+  public getBlock(blockNumber: string) {
+    return this.web3.eth.getBlock(blockNumber);
+  }
+
 
   private txsToBytes32BundleArr(rawTxStringArr) {
     let bytes32Bundle = [];

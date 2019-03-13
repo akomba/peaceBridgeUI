@@ -1,8 +1,9 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ɵConsole} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {BridgeService, gasPerChallenge, gasPrice } from '../util/bridge.service';
 // import { ethers, Wallet } from 'ethers';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { isFulfilled } from 'q';
 // import { TransactionReceipt } from 'ethers/providers';
 // import { throwError } from 'ethers/errors';
 
@@ -52,7 +53,6 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
           // collect the incoming transfers
           let t: any [] = [];
-          console.log(transfers);
           const addr = this._bs.getCurrentAddress().toLowerCase();
           for (let i = 0; i < transfers.length; i++) {
             if ('0x' + transfers[i].topics[2].slice(26) === addr &&
@@ -60,7 +60,6 @@ export class WithdrawComponent implements OnInit, OnDestroy {
               t.push(transfers[i]);
             }
           }
-          console.log(t);
         }
       }
     }
@@ -82,26 +81,23 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         if (res === null) {
           throw({message: 'Transaction not found'});
         }
-
-        console.log('res', res);
         this.tokenId = res.logs[0].topics[3];
-        console.log('TOKEN ID', this.tokenId);
+
+        const owner = await this._bs.getTokenOwner(this.tokenId);
+        if (owner.toLowerCase() !== this._bs.getCurrentAddress().toLowerCase()) {
+          throw({message: 'No token id found'});
+        }
+
+
 
         // getting the transaction hash
         this.transferTxHash =  await this.getTransferTxHash(res);
-        console.log('TRANSER TX HASH', this.transferTxHash);
+
+        const txNonce = await this._bs.getTransferNonce(this.tokenId);
 
         if ( this.transferTxHash === null) {
           throw ({message: 'No transfer tx hash found.'});
         }
-
-        // TODO: check if the withdrawer is own THAT token
-
-
-
-
-
-
 
 
         const tx: any = await this._bs.withdraw(this.tokenId);
@@ -120,12 +116,17 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         localStorage.setItem('toAddress', toAddress);
         localStorage.setItem('withdrawArgs', JSON.stringify(withdrawArgs));
         localStorage.setItem('tokenId', this.tokenId);
+        localStorage.setItem('nonce', txNonce);
         localStorage.setItem('time', new Date().getTime().toString());
         await this.waitForNetwork('ropsten');
 
       } catch (e) {
-        console.log('ERROR::', e);
-        this.errorMessage = e.message;
+        if (e.message.indexOf('reverted by the EVM') > -1) {
+            this.errorMessage = 'Transaction reverted by EVM';
+        } else {
+            this.errorMessage = e.message;
+        }
+
         this.isLoading = false;
       }
     }
@@ -152,20 +153,28 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     private async withdrawOnDepositContract() {
       const withdrawArgs = JSON.parse(localStorage.getItem('withdrawArgs'));
       const toAddress = localStorage.getItem('toAddress');
-      const amt = gasPerChallenge * gasPrice;
+      let amt = gasPerChallenge * gasPrice;
 
       this.tokenId = localStorage.getItem('tokenId');
+      const nonce = parseInt(localStorage.getItem('nonce'), 10);
+
+      if (nonce > 0) {
+        amt = amt * nonce;
+      }
 
       this.loaderMessage = 'Withdraw on deposit contract';
       let result = null;
       try {
-          result = await this._bs.withdrawOnDepositContract(toAddress, this.tokenId, withdrawArgs.bytes32Bundle, withdrawArgs.txLengths, withdrawArgs.txMsgHashes, 1,  amt);
+          result = await this._bs.withdrawOnDepositContract(toAddress, this.tokenId, withdrawArgs.bytes32Bundle, withdrawArgs.txLengths, withdrawArgs.txMsgHashes, nonce,  amt);
           this.resultHash = result.transactionHash;
           this.isLoading = false;
         } catch (e) {
-        this.isLoading = false;
-        this.errorMessage = e.message;
-        console.log('ERROR', e);
+          if (e.message.indexOf('reverted by the EVM') > -1) {
+              this.errorMessage = 'Transaction reverted by EVM';
+          } else {
+              this.errorMessage = e.message;
+          }
+          this.isLoading = false;
       }
     }
 

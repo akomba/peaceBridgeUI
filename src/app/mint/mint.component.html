@@ -19,9 +19,11 @@
     </div>
   </div>
 
-  <div *ngIf="isMintingFinished" class="col-md-12 mt-3">
-    <p><span><b>token id:</b> {{mintedTokenId}}</span></p>
-    <p><b>tx hash:</b> {{txHash}} <a href="https://kovan.etherscan.io/tx/{{txHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a></p>
+  <div *ngIf="isMintingFinished" class="col-md-12 mt-3 text-center">
+    <ngb-alert [type]="'success'" [dismissible]="false">
+      <b>token id:</b> {{mintedTokenId}}<br/>
+      <b>tx hash:</b> {{txHash}} <a href="https://kovan.etherscan.io/tx/{{txHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+    </ngb-alert>
   </div>
 
 </div>
