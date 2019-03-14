@@ -36,6 +36,7 @@ export class BridgeService {
   public accountCast: Observable<string>;
 
   private tokenContractWeb3: any = null;
+  private tokenContractInfuraWeb3: any = null;
   private depositContractWeb3: any = null;
 
   private connectedNetwork = '';
@@ -80,7 +81,8 @@ export class BridgeService {
           }
         });
 
-        this.tokenContractWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
+        this.tokenContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
+        this.tokenContractInfuraWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
         this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
 
         this.web3.eth.net.getNetworkType().then(ntwType => {
@@ -300,11 +302,11 @@ export class BridgeService {
   }
 
   public getTransferNonce(tokenId) {
-    return this.tokenContractWeb3.methods.transferNonce(tokenId).call();
+    return this.tokenContractInfuraWeb3.methods.transferNonce(tokenId).call();
   }
 
   public getTokenOwner(tokenId: string) {
-    return this.tokenContractWeb3.methods.ownerOf(tokenId).call();
+    return this.tokenContractInfuraWeb3.methods.ownerOf(tokenId).call();
   }
 
 
