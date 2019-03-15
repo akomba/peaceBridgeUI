@@ -74,12 +74,23 @@ export class BridgeService {
         // this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
         // watching account changes
-        this.web3.currentProvider.publicConfigStore.on('update', (res) => {
+
+      /*   this.web3.currentProvider.publicConfigStore.on('update', (res) => {
           if (this.selectedAddress !== res.selectedAddress) {
             this.selectedAddress = res.selectedAddress;
             this.accountChange.next(this.selectedAddress);
           }
-        });
+        }); */
+        console.log(this.web3);
+
+        const t = this;
+        let accountInterval = setInterval(async function() {
+          let accounts = await t.web3.eth.getAccounts();
+          if (accounts[0] !== t.selectedAddress) {
+            t.selectedAddress = accounts[0];
+            t.accountChange.next(t.selectedAddress);
+          }
+        }, 600);
 
         this.tokenContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
         this.tokenContractInfuraWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);

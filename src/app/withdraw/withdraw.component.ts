@@ -111,7 +111,9 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         const withdrawArgs = await this._bs.formBundleLengthsHashes([rawWithdrawal, rawTransferFrom, rawCustodianApprove]);
 
         const receipt = await this._bs.getW3TxReceipt(this.transferTxHash);
-        const toAddress = '0x' + receipt['logs'][0]['topics'][2].substr(26);
+
+        let addr: string = <string>receipt['logs'][0]['topics'][2];
+        const toAddress = '0x' + addr.substr(26);
 
         localStorage.setItem('toAddress', toAddress);
         localStorage.setItem('withdrawArgs', JSON.stringify(withdrawArgs));
