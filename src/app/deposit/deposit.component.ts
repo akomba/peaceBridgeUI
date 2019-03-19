@@ -36,7 +36,7 @@ export class DepositComponent implements OnInit, OnDestroy {
         return;
       }
 
-      if (this._bs.getCurrentAddress() !== ''){
+      if (this._bs.getCurrentAddress() !== '') {
         this.getTokens();
       }
 

@@ -48,7 +48,12 @@ export class ClaimComponent implements OnInit {
         this.transactionHash =  result.transactionHash;
         this.isLoading = false;
       } catch (e) {
-        this.errorMessage = e.message;
+          if (e.message.indexOf('reverted by the EVM') > -1) {
+            this.errorMessage = 'Transaction reverted by EVM. Is the challenge period ended yet?';
+          } else {
+              this.errorMessage = e.message;
+          }
+
         this.isLoading = false;
       }
     }

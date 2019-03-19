@@ -49,9 +49,15 @@ export class TransferComponent implements OnInit, OnDestroy {
 
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
+      console.log('connected network', connectedNetwork);
+
       if (connectedNetwork !== 'kovan') {
         this.loaderMessage = 'Please connect to the foreign netwok!';
         return;
+      }
+
+      if (this._bs.getCurrentAddress() !== '') {
+        this.getTokenIds();
       }
 
       this.accountChangeRef = this._bs.accountCast.subscribe( async () => {
@@ -60,7 +66,6 @@ export class TransferComponent implements OnInit, OnDestroy {
           });
       });
 
-     // this.getTokenIds();
     }
 
     public async getTokenIds() {
