@@ -60,7 +60,7 @@ export class TransferComponent implements OnInit, OnDestroy {
           });
       });
 
-      this.getTokenIds();
+     // this.getTokenIds();
     }
 
     public async getTokenIds() {

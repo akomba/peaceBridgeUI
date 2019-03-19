@@ -36,13 +36,13 @@ export class DepositComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.getTokens();
+      if (this._bs.getCurrentAddress() !== ''){
+        this.getTokens();
+      }
 
       this.accountChangeRef = this._bs.accountCast.subscribe( async () => {
-
-
         this.zone.run(() => {
-          this.mintedTokensFiltered = null;
+          this.mintedTokensFiltered = [];
           this.transactionHash = '';
           this.getTokens();
           });

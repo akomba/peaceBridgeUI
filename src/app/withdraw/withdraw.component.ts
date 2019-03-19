@@ -48,11 +48,12 @@ export class WithdrawComponent implements OnInit, OnDestroy {
           this.loaderMessage = 'Please connect to the foreign netwok!';
         } else {
 
-          const address = this._bs.getCurrentAddress().toLowerCase();
+          // const address = this._bs.getCurrentAddress().toLowerCase();
           const transfers = await this._bs.getTransferEventsFromTokenContract(1);
 
           // collect the incoming transfers
           let t: any [] = [];
+          const a = this._bs.getCurrentAddress();
           const addr = this._bs.getCurrentAddress().toLowerCase();
           for (let i = 0; i < transfers.length; i++) {
             if ('0x' + transfers[i].topics[2].slice(26) === addr &&

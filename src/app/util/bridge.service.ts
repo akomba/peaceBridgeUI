@@ -73,16 +73,12 @@ export class BridgeService {
         this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
         // this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
-        // watching account changes
+        // get the first account
+        const accounts = await this.web3.eth.getAccounts();
+        this.selectedAddress = accounts[0];
+        this.accountChange.next(this.selectedAddress);
 
-      /*   this.web3.currentProvider.publicConfigStore.on('update', (res) => {
-          if (this.selectedAddress !== res.selectedAddress) {
-            this.selectedAddress = res.selectedAddress;
-            this.accountChange.next(this.selectedAddress);
-          }
-        }); */
-        console.log(this.web3);
-
+        // start polling for account changes
         const t = this;
         let accountInterval = setInterval(async function() {
           let accounts = await t.web3.eth.getAccounts();
@@ -104,7 +100,7 @@ export class BridgeService {
 
   /* Contract functions */
   public mintToken (amount: any) {
-    if (this.selectedAddress !== '') {
+    if (this.selectedAddress !== null) {
       return this.tokenContractWeb3.methods.mint(amount, this.selectedAddress).send({from: this.selectedAddress });
     } else {
       throw ({message: 'No address found.'});
@@ -230,10 +226,10 @@ export class BridgeService {
   }
 
   public getCurrentAddress() {
-    if (this.selectedAddress !== '') {
+    if (this.selectedAddress !== null) {
       return this.selectedAddress;
     }
-    return '....';
+    return '';
   }
 
   public getBalanceForCurrentAccount() {

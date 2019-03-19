@@ -18,7 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const t = this;
     this.accountChangeRef = this._bs.accountCast.subscribe( (someAcc) => {
       this.zone.run(() => {
-        this.currentAccount = this._bs.getCurrentAddress();
+        this.currentAccount = t._bs.getCurrentAddress();
         });
     });
   }

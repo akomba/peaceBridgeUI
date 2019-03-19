@@ -29,6 +29,12 @@
           </div>
       </li>
     </ul>
+
+    <div *ngIf="mintedTokensFiltered.length == 0" class="col-md-12 mt-3 text-center">
+      <ngb-alert [type]="'warning'" [dismissible]="false">
+        <b>No tokens found.</b>
+      </ngb-alert>
+    </div>
   </div>
 
 
