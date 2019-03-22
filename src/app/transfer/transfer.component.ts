@@ -73,10 +73,13 @@ export class TransferComponent implements OnInit, OnDestroy {
       this.isLoading = true;
 
       const res = await this._bs.getTransferEventsFromTokenContract(1);
+      const res1 = await this._bs.getTransferRequestEventsFromTokenContract(1);
 
       const currentAddress = this._bs.getCurrentAddress();
       let tokens: any[] = [];
       let sentTokens: any[] = [];
+
+
 
       for (let i = 0; i < res.length; i++) {
        if ('0x' + res[i].topics[2].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
@@ -86,7 +89,20 @@ export class TransferComponent implements OnInit, OnDestroy {
           sentTokens.push(res[i].topics[3]);
         }
       }
-      this.tokens = tokens.filter(this.comparer(sentTokens));
+
+      for (let i = 0; i < tokens.length; i++) {
+        let match = false;
+        for (let j = 0; j < sentTokens.length; j++ ) {
+          if (tokens[i] === sentTokens[j]) {
+            sentTokens.splice(j, 1);
+            match = true;
+            break;
+          }
+        }
+        if (!match) {
+          this.tokens.push(tokens[i]);
+        }
+      }
       this.isLoading = false;
     }
 
@@ -126,17 +142,4 @@ export class TransferComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         }
     }
-
-    private comparer(otherArray: any) {
-      return function(current: any) {
-        return otherArray.filter(function(other: string, idx: number , arr: any) {
-          if (other === current) {
-            delete arr[idx];
-            return true;
-          }
-          return false;
-        }).length === 0;
-      };
-    }
-
 }
