@@ -9,7 +9,17 @@
     </ngb-alert>
   </div>
 
-  <div *ngIf="transactionHash==''" class="col-md-12">
+  <div class="col-md-12 mt-3 mb-3">
+    <div class="form-group mt-3">
+      <label for="depositAmount">Minter address</label>
+      <input type="text" class="form-control" id="minter-address" name="minter-address" placeholder="Minter address" [(ngModel)]="minterAddress" minlength="42" required #addr="ngModel">
+    </div>
+    <div class="mt-4 text-center">
+      <button class="btn btn-success" (click)="findTokens()">Find tokens</button>
+    </div>
+  </div>
+
+  <div *ngIf="transactionHash==''" class="col-md-12 mb-5">
     <ul class="list-group transactions">
       <li *ngFor="let t of mintedTokensFiltered; let i = index" class="list-group-item">
 
@@ -18,7 +28,9 @@
               <span class="token-id" ngbTooltip="{{t.tokenId}}"><b>token id:</b> {{t.tokenId | hashShortener:6}}</span>
             </div>
             <div class="col-md-3">
-              <span class="amount"><b>amount:</b> {{t.amount}}</span>
+              <span class="amount"><b>amount:</b></span>
+              <input type="number" class="form-control" id="minter-address-{{i}}" name="minter-address-{{i}}" [(ngModel)]="t.amount" >
+
             </div>
             <div class="col-md-3">
               <span class="minter-address" ngbTooltip="{{t.minter}}"><b>minter:</b> {{t.minter | hashShortener:4}}</span>
@@ -30,7 +42,7 @@
       </li>
     </ul>
 
-    <div *ngIf="mintedTokensFiltered.length == 0" class="col-md-12 mt-3 text-center">
+    <div *ngIf="noTokensFound" class="col-md-12 mt-3 text-center">
       <ngb-alert [type]="'warning'" [dismissible]="false">
         <b>No tokens found.</b>
       </ngb-alert>

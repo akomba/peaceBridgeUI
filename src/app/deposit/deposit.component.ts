@@ -17,6 +17,8 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     public loaderMessage = '';
     public transactionHash = '';
+    public minterAddress = '';
+    public noTokensFound = false;
     public mintedTokensFiltered: any[] = [];
     private mintedTokens: any[] = [];
     private depositedTokens: any[] = [];
@@ -34,9 +36,11 @@ export class DepositComponent implements OnInit, OnDestroy {
       if (connectedNetwork !== 'ropsten') {
         this.loaderMessage = 'Please connect to the home netwok!';
         return;
+      } else {
+        this.isLoading = false;
       }
 
-      if (this._bs.getCurrentAddress() !== '') {
+      /* if (this._bs.getCurrentAddress() !== '') {
         this.getTokens();
       }
 
@@ -46,25 +50,42 @@ export class DepositComponent implements OnInit, OnDestroy {
           this.transactionHash = '';
           this.getTokens();
           });
-      });
+      }); */
     }
 
     ngOnDestroy() {
-      if (this.accountChangeRef) {
+      /* if (this.accountChangeRef) {
         this.accountChangeRef.unsubscribe();
+      } */
+    }
+
+    public findTokens() {
+      if (this.minterAddress !== '') {
+        this.getTokens(this.minterAddress);
       }
     }
 
-    public async getTokens() {
+    public async getTokens(address: string) {
+      this.mintedTokensFiltered = [];
+      this.noTokensFound = false;
       this.loaderMessage = 'Getting the latest minted tokens';
       this.isLoading = true;
-      this.mintedTokens = await this.getMintedTokens();
+      this.mintedTokens = await this.getMintedTokens(address);
       this.depositedTokens = await this.getDepositEvents();
       this.mintedTokensFiltered = this.mintedTokens.filter(this.comparer(this.depositedTokens));
+
+      if (this.mintedTokensFiltered.length === 0) {
+        this.noTokensFound = true;
+      }
       this.isLoading = false;
     }
 
     public async deposit(index: number) {
+      this.errorMessage = '';
+      if ( this.mintedTokensFiltered[index].amount === null || this.mintedTokensFiltered[index].amount === 0) {
+        this.errorMessage = 'Amount can\'t be 0';
+        return;
+      }
 
       this.isLoading = true;
       this.errorMessage = '';
@@ -81,13 +102,13 @@ export class DepositComponent implements OnInit, OnDestroy {
       }
     }
 
-    private async getMintedTokens() {
+    private async getMintedTokens(minter: string) {
       const res = await this._bs.getMintEventsFromTokenContract(1);
       const currentAddress = this._bs.getCurrentAddress();
       let eventsLog: any[] = [];
 
       for (let i = 0; i < res.length; i++) {
-       if ('0x' + res[i].topics[1].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
+       if ('0x' + res[i].topics[1].slice(26).toLowerCase() === minter.toLowerCase()) {
           eventsLog.push({
             tokenId: '0x' + res[i].data.slice(130),
             amount: parseInt(res[i].data.slice(2, 66), 16),
@@ -105,13 +126,13 @@ export class DepositComponent implements OnInit, OnDestroy {
       let eventsLog: any[] = [];
 
       for (let i = 0; i < res.length; i++) {
-       if ('0x' + res[i].topics[1].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
+     //  if ('0x' + res[i].topics[1].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
             eventsLog.push({
             tokenId: '0x' + res[i].data.slice(66, 130),
             amount: parseInt(res[i].data.slice(2, 66), 16),
             minter: '0x' + res[i].topics[1].slice(26)
           });
-        }
+      //  }
       }
 
       return eventsLog;
@@ -120,7 +141,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     private comparer(otherArray) {
       return function(current) {
         return otherArray.filter(function(other) {
-          return other.tokenId === current.tokenId && other.amount === current.amount;
+          return other.tokenId === current.tokenId /* && other.amount === current.amount */;
         }).length === 0;
       };
     }
