@@ -27,6 +27,8 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
     public resultHash: any = '';
 
+    public accountCheckerVisible = false;
+
     constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute) {
     }
 
@@ -40,27 +42,14 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         if (connectedNetwork !== 'ropsten') {
           this.loaderMessage = 'Please connect to the home netwok!';
         } else {
-          this.withdrawOnDepositContract();
+          // popup with address change
+          this.accountCheckerVisible = true;
+          this.isLoading = false;
         }
       } else {
         if (connectedNetwork !== 'kovan') {
           this.isLoading = true;
           this.loaderMessage = 'Please connect to the foreign netwok!';
-        } else {
-
-          // const address = this._bs.getCurrentAddress().toLowerCase();
-          const transfers = await this._bs.getTransferEventsFromTokenContract(1);
-
-          // collect the incoming transfers
-          let t: any [] = [];
-          const a = this._bs.getCurrentAddress();
-          const addr = this._bs.getCurrentAddress().toLowerCase();
-          for (let i = 0; i < transfers.length; i++) {
-            if ('0x' + transfers[i].topics[2].slice(26) === addr &&
-            transfers[i].topics[1] !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-              t.push(transfers[i]);
-            }
-          }
         }
       }
     }
@@ -88,7 +77,6 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         if (owner.toLowerCase() !== this._bs.getCurrentAddress().toLowerCase()) {
           throw({message: 'No token id found'});
         }
-
 
 
         // getting the transaction hash
@@ -129,9 +117,14 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         } else {
             this.errorMessage = e.message;
         }
-
         this.isLoading = false;
       }
+    }
+
+    public continueWithdraw() {
+      this.accountCheckerVisible = false;
+      this.isLoading = true;
+      this.withdrawOnDepositContract();
     }
 
 
@@ -150,6 +143,8 @@ export class WithdrawComponent implements OnInit, OnDestroy {
       }
       return null;
     }
+
+
 
 
 

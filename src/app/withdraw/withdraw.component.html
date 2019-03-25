@@ -38,4 +38,20 @@
 </div>
 
 
+<div *ngIf="accountCheckerVisible" id="withdraw-modal" class="input-modal d-flex h-100" >
+  <div class="modal-body justify-content-center align-self-center col-md-6 offset-md-3 text-center">
+
+    <h3>The selected account is</h3>
+
+    <h5 class="mt-3 mb-3">{{_bs.getCurrentAddress()}}</h5>
+
+    <h5 class="mb-5">Do you want to use the account above for signing the tx?<br>(You can choose an another account in metamask.)</h5>
+
+    <button (click)="continueWithdraw()">YES</button>
+
+
+  </div>
+</div>
+
+
 
