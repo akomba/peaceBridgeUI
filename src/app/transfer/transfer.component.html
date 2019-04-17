@@ -19,7 +19,9 @@
           <label for="to-address">Address to transfer</label>
           <input type="text" class="form-control" id="to-address" placeholder="Enter the recipent's address" [(ngModel)]="toAdress" minlength="42" required #addr="ngModel">
         </div>
-        <button type="submit" class="btn btn-primary" (click)="transfer()" [disabled]=" addr.errors">Send transfer request</button>
+        <div class="mt-4 text-center">
+          <button type="submit" class="btn btn-success" (click)="transfer()" [disabled]=" addr.errors">Send transfer request</button>
+        </div>
   </div>
 
   <div  *ngIf="errorMessage" class="col-md-12 text-center mt-3">

@@ -6,13 +6,78 @@
 
 <div class="row">
 
-  <div class="col-md-12">
+<!--   <div class="col-md-12">
     <div class="form-group">
       <label for="approve-tx-hash">Approval TX Hash</label>
       <input type="text" class="form-control" id="approve-tx-hash" placeholder="Enter the  custodian approval tx hash" [(ngModel)]="custApproveTxHash" minlength="66" required #custapptxhash="ngModel">
     </div>
     <button type="submit" class="btn btn-primary" (click)="withdraw()" [disabled]="custapptxhash.errors">Initiate withdraw</button>
-  </div>
+  </div> -->
+
+  <ngb-tabset>
+    <ngb-tab title="Tokens">
+      <ng-template ngbTabContent>
+          <div class="col-md-12 mt-3 mb-5 pl-0 pr-0">
+            <ul class="list-group transactions">
+              <li *ngFor="let t of tokens; let i = index" class="list-group-item">
+                <div class="row">
+                  <div class="col-md-5">
+                    <span class="token-id" ngbTooltip="{{t.topics[3]}}"><b>token id:</b> {{t.topics[3] | hashShortener:6}}</span>
+                  </div>
+                  <div class="col-md-5">
+                    <span class="minter-address" ngbTooltip="{{t.transactionHash}}"><b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}</span>
+                  </div>
+                  <div class="col-md-2 text-right">
+                    <button class="btn btn-sm btn-primary" (click)="withdraw(i)">Withdraw</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <div *ngIf="noTokensFound" class="col-md-12 mt-3 text-center">
+              <ngb-alert [type]="'warning'" [dismissible]="false">
+                <b>No tokens found.</b>
+              </ngb-alert>
+            </div>
+          </div>
+      </ng-template>
+    </ngb-tab>
+
+    <ngb-tab title="Withdrawn tokens">
+      <ng-template ngbTabContent>
+          <div class="col-md-12 mt-3 mb-5 pl-0 pr-0">
+              <ul class="list-group transactions">
+                <li *ngFor="let t of withdrawnTokens; let i = index" class="list-group-item">
+                  <div class="row">
+                    <div class="col-md-5">
+                      <span class="token-id" ngbTooltip="{{t.topics[3]}}"><b>token id:</b> {{t.topics[3] | hashShortener:6}}</span>
+                    </div>
+                    <div class="col-md-5">
+                      <span class="minter-address" ngbTooltip="{{t.transactionHash}}"><b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}</span>
+                    </div>
+                    <div class="col-md-2 text-right">
+                      <button class="btn btn-sm btn-primary" (click)="withdraw(i)">Withdraw</button>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+
+              <div *ngIf="noWithdrawnTokensFound" class="col-md-12 mt-3 text-center">
+                <ngb-alert [type]="'warning'" [dismissible]="false">
+                  <b>No  withdrawn tokens found.</b>
+                </ngb-alert>
+              </div>
+            </div>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
+
+
+
+
+
+
+
 
 
   <div *ngIf="resultHash != ''" class="col-md-12 mt-3 text-center">

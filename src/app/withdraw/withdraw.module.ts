@@ -3,14 +3,18 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {WithdrawComponent} from './withdraw.component';
 import {RouterModule} from '@angular/router';
-import { NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbTooltipModule, NgbTabsetModule} from '@ng-bootstrap/ng-bootstrap';
+import { SharedModule } from '../util/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
     FormsModule,
-    NgbAlertModule
+    NgbAlertModule,
+    NgbTooltipModule,
+    NgbTabsetModule,
+    SharedModule
   ],
   declarations: [WithdrawComponent],
   exports: [WithdrawComponent]

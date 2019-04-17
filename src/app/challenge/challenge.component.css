@@ -32,3 +32,43 @@ ul.transactions span{
   right: 5px;
   cursor: pointer;
 }
+
+ngb-tabset {
+  width:100%;
+}
+
+.list-group-item {
+  border-top: 0;
+  border-left:0;
+  border-right:0;
+
+}
+
+.proof-container {
+  min-height: 30vh;
+  max-height: 30vh;
+  overflow-y: scroll;
+  border-top: solid 1px #eee;
+}
+
+li.active {
+  background: #000;
+}
+
+
+
+.tab-title {
+  line-height: 24px;
+}
+
+.tab-title span {
+  display: inline-block;
+  opacity: 0.3;
+  line-height: 24px;
+  margin-left: 5px;
+}
+
+.tab-title span:hover {
+  opacity: 1;
+}
+

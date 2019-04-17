@@ -33,7 +33,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       this.loaderMessage = 'Connecting to network';
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
-      if (connectedNetwork !== 'ropsten') {
+      if (connectedNetwork !== 'classic') {
         this.loaderMessage = 'Please connect to the home netwok!';
         return;
       } else {
@@ -61,6 +61,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     public findTokens() {
       if (this.minterAddress !== '') {
+        this.transactionHash = '';
         this.getTokens(this.minterAddress);
       }
     }

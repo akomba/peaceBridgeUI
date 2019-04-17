@@ -1,6 +1,7 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { Router } from '@angular/router';
 import { BridgeService } from '../util/bridge.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-claim',
@@ -15,23 +16,47 @@ export class ClaimComponent implements OnInit {
     public  tokenId: string;
 
     public loaderMessage = '';
-    public transactionHash = '';
+    public transactionHash = ''
+
+    public tokens: any[] = [];
+    public tokenIdIdx = -1;
+    private accountChangeRef: Subscription = null;
 
 
-    constructor(public _bs: BridgeService, private _router: Router) {}
+    constructor(public _bs: BridgeService, private _router: Router, private zone: NgZone) {}
 
     async ngOnInit() {
       this.isLoading = true;
       this.loaderMessage = 'Connecting to network';
       const connectedNetwork = await this._bs.getConnectedNetwork();
-      if (connectedNetwork !== 'ropsten') {
+      if (connectedNetwork !== 'classic') {
         this.loaderMessage = 'Please connect to the home netwok!';
-      } else {
-        this.isLoading = false;
+        return;
       }
+
+      if (this._bs.getCurrentAddress() !== '') {
+        this.getTokens();
+      }
+
+      this.accountChangeRef = this._bs.accountCast.subscribe( async () => {
+        this.zone.run(() => {
+          this.getTokens();
+          });
+      });
     }
 
-    public async claim() {
+
+    public async getTokens() {
+      this.errorMessage = '';
+      this.transactionHash = '';
+
+      this.loaderMessage = 'Collecting tokens...';
+      const currentAddress = this._bs.getCurrentAddress();
+      this.tokens = await this._bs.getWithdrawEventsFromTokenContract(1, currentAddress);
+      this.isLoading = false;
+    }
+
+    public async claim(isStake: boolean) {
       this.transactionHash = '';
       this.errorMessage = '';
 
@@ -39,14 +64,46 @@ export class ClaimComponent implements OnInit {
       this.isLoading = true;
 
       try {
-        const owner = await this._bs.getTokenOwner(this.tokenId);
-        if (owner.toLowerCase() !== this._bs.getCurrentAddress().toLowerCase()) {
-          throw({message: 'No token id found'});
+          const tokenId = (isStake) ? this.tokenId : this.tokens[this.tokenIdIdx].topics[1];
+          const challengeTime = await this._bs.getChallengeEndTime(tokenId);
+          const challengeEndNonce = await this._bs.getChallengeEndNonce(tokenId);
+          const lastProvenNonce = await this._bs.getLastProvenNonce(tokenId);
+
+        if (!isStake) {
+          if (challengeTime === 0) {
+            throw({message: 'The challenge period has not started yet'});
+          }
+          if (challengeTime * 1000 > Date.now()) {
+            throw({message: 'The challenge period has not ended yet'});
+          }
+          if (challengeEndNonce !== lastProvenNonce) {
+            throw({message: 'The challenge response has not been proven to endNonce'});
+          }
+
+          const owner = await this._bs.getTokenOwner(tokenId);
+          if (owner.toLowerCase() !== this._bs.getCurrentAddress().toLowerCase()) {
+            throw({message: 'No token id found'});
+          }
+
+          const result = await this._bs.claim(tokenId);
+          this.transactionHash =  result.transactionHash;
+          this.isLoading = false;
+        } else {
+          if (challengeTime === 0) {
+            throw({message: 'The challenge period has not started yet'});
+          }
+          if (challengeTime * 1000 > Date.now()) {
+            throw({message: 'The challenge period has not ended yet'});
+          }
+          if (challengeEndNonce === lastProvenNonce && lastProvenNonce === 0 ) {
+            throw({message: 'Challenge not initated / withdrawal is honest'});
+          }
+
+          const result = await this._bs.claimStake(this.tokenId);
+          this.transactionHash =  result.transactionHash;
+          this.isLoading = false;
         }
 
-        const result = await this._bs.claim(this.tokenId);
-        this.transactionHash =  result.transactionHash;
-        this.isLoading = false;
       } catch (e) {
           if (e.message.indexOf('reverted by the EVM') > -1) {
             this.errorMessage = 'Transaction reverted by EVM. Is the challenge period ended yet?';

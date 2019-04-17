@@ -1,13 +1,10 @@
-import {Component, OnInit, OnDestroy, ɵConsole} from '@angular/core';
+import {Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {BridgeService, gasPerChallenge, gasPrice } from '../util/bridge.service';
-// import { ethers, Wallet } from 'ethers';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-import { isFulfilled } from 'q';
-// import { TransactionReceipt } from 'ethers/providers';
-// import { throwError } from 'ethers/errors';
+import { Subscription } from 'rxjs';
 
-const expirationTime = 60000;
+
+const expirationTime = 120000;
 
 @Component({
   selector: 'app-withdraw',
@@ -21,6 +18,8 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     public loaderMessage = '';
 
     public tokenId = '';
+    public noTokensFound = false;
+    public noWithdrawnTokensFound = false;
     public transferTxHash = '';
     public custApproveTxHash = '';
     public withdrawTxHash = '';
@@ -29,7 +28,12 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
     public accountCheckerVisible = false;
 
-    constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute) {
+    public tokens: any [] = [];
+    public withdrawnTokens: any [] = [];
+
+    private accountChangeRef: Subscription = null;
+
+    constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute, private zone: NgZone) {
     }
 
     async ngOnInit() {
@@ -39,7 +43,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
       const now = new Date().getTime();
       if (time !== null && now - parseInt(time, 10) < expirationTime ) {
         this.isLoading = true;
-        if (connectedNetwork !== 'ropsten') {
+        if (connectedNetwork !== 'classic') {
           this.loaderMessage = 'Please connect to the home netwok!';
         } else {
           // popup with address change
@@ -47,20 +51,104 @@ export class WithdrawComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         }
       } else {
-        if (connectedNetwork !== 'kovan') {
+        if (connectedNetwork !== 'ethereum') {
           this.isLoading = true;
           this.loaderMessage = 'Please connect to the foreign netwok!';
+        } else {
+
+
+
+          if (this._bs.getCurrentAddress() !== '') {
+            this.getTokens();
+          }
+
+          this.accountChangeRef = this._bs.accountCast.subscribe( async () => {
+            this.zone.run(() => {
+              this.getTokens();
+              });
+          });
+
         }
       }
     }
 
     public ngOnDestroy(): void {
+      if (this.accountChangeRef !== null) {
+        this.accountChangeRef.unsubscribe();
+      }
     }
 
-    public async withdraw() {
+    private async getTokens() {
+      this.loaderMessage = 'Collecting tokens...';
+      this.isLoading = true;
+
+      this.tokens = [];
+      this.withdrawnTokens = [];
+      this.noTokensFound = false;
+      this.noWithdrawnTokensFound = false;
+
+      const currentAddress = this._bs.getCurrentAddress();
+      const allIncoming: any[] = await this._bs.getTransferEventsFromTokenContract(1, null, currentAddress);
+      const outgoing: any[] = await this._bs.getTransferEventsFromTokenContract(1, currentAddress, null);
+      const withdrawals: any[] = await this._bs.getWithdrawEventsFromTokenContract(1, currentAddress);
+
+      let incoming: any[] = [];
+
+      // filter mints
+      for (let i = 0; i < allIncoming.length; i++) {
+        if (allIncoming[i].topics[1] !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+          incoming.push(allIncoming[i]);
+        }
+      }
+
+      // filter outgoing transfers
+      let filtered: any = [];
+      for (let i = 0; i < incoming.length; i++) {
+        let match = false;
+        for (let j = 0; j < outgoing.length; j++ ) {
+          if (incoming[i].topics[3] === outgoing[j].topics[3]) {
+            outgoing.splice(j, 1);
+            match = true;
+            break;
+          }
+        }
+        if (!match) {
+          filtered.push(incoming[i]);
+        }
+      }
+      // filter withdrawn tokens
+      for (let i = 0; i < filtered.length; i++) {
+        let match = false;
+        for (let j = 0; j < withdrawals.length; j++) {
+          if (filtered[i].topics[3] === withdrawals[j].topics[1]) {
+            match = true;
+            break;
+          }
+        }
+        if (!match) {
+          this.tokens.push(filtered[i]);
+        } else {
+          this.withdrawnTokens.push(filtered[i]);
+        }
+      }
+
+      if (this.tokens.length === 0) {
+        this.noTokensFound = true;
+      }
+
+      if (this.withdrawnTokens.length === 0) {
+        this.noWithdrawnTokensFound = true;
+      }
+
+      this.isLoading = false;
+    }
+
+    public async withdraw(idx: number) {
+
+      this.custApproveTxHash = this.tokens[idx].transactionHash;
 
       this.isLoading = true;
-      await this.waitForNetwork('kovan');
+      await this.waitForNetwork('ethereum');
 
       this.loaderMessage = 'Withdraw on tonken contract';
 
@@ -88,7 +176,6 @@ export class WithdrawComponent implements OnInit, OnDestroy {
           throw ({message: 'No transfer tx hash found.'});
         }
 
-
         const tx: any = await this._bs.withdraw(this.tokenId);
 
 
@@ -109,7 +196,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         localStorage.setItem('tokenId', this.tokenId);
         localStorage.setItem('nonce', txNonce);
         localStorage.setItem('time', new Date().getTime().toString());
-        await this.waitForNetwork('ropsten');
+        await this.waitForNetwork('classic');
 
       } catch (e) {
         if (e.message.indexOf('reverted by the EVM') > -1) {
@@ -179,7 +266,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     private async waitForNetwork(targetNetwork: string ) {
       const connectedNetwork = await this._bs.getConnectedNetwork();
       if (connectedNetwork !== targetNetwork) {
-        this.loaderMessage = 'Please connect to the ' + ((targetNetwork === 'ropsten') ? 'home' : 'foreign') + ' netwok!';
+        this.loaderMessage = 'Please connect to the ' + ((targetNetwork === 'classic') ? 'home' : 'foreign') + ' netwok!';
         const delay = new Promise(resolve => setTimeout(resolve, 300));
         await delay;
         return await this.waitForNetwork(targetNetwork);

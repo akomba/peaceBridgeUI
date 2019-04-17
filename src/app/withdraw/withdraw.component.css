@@ -22,3 +22,14 @@
   right: 5px;
   cursor: pointer;
 }
+
+ngb-tabset {
+  width:100%;
+}
+
+.list-group-item {
+  border-top: 0;
+  border-left:0;
+  border-right:0;
+
+}

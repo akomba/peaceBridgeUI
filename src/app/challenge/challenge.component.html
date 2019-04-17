@@ -10,52 +10,109 @@
   </div>
 
   <ngb-tabset>
-    <ngb-tab title="Withdrawals">
+    <ngb-tab>
+      <ng-template ngbTabTitle>
+          <div  class="tab-title"  (click)="tabSwitch('withdraw')">Withdrawals<span [className]="isWithdrawalsRefreshing?'glyphicon glyphicon-refresh fast-right-spinner':'glyphicon glyphicon-refresh'" (click) = "refreshTab('withdraw')"></span></div>
+      </ng-template>
+
       <ng-template ngbTabContent>
-        <div *ngIf="transactionHash == ''" class="col-md-12">
+        <div *ngIf="transactionHash == ''" class="col-md-12 pl-0 pr-0 mb-5">
           <div *ngIf="withdrawals.length > 0">
             <ul class="list-group transactions">
               <li *ngFor="let t of withdrawals; let i = index" class="list-group-item">
-                  <span class=""><b>txHash:</b> {{t.transactionHash}}</span>
-                  <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
-                  <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
-                  <span class="token-id"><b>token id:</b> {{t.topics[2]}}</span>
-                  <span class="token-id"><b>Challenge period ends at</b> {{t.challengeEnd | date:'short'}}</span>
+                <div class="row">
+                    <div class="col-md-4">
+                      <span><b>block:</b> {{t.blockNumber}}</span>
+                      <span ngbTooltip="{{t.transactionHash}}"><b>txHash:</b> {{t.transactionHash | hashShortener:4}}</span>
+                    </div>
+                    <div class="col-md-4 text-center">
+                      <span ngbTooltip="{{t.topics[2]}}"><b>token id:</b> {{t.topics[2] | hashShortener:6}}</span>
+                    </div>
+                    <div class="col-md-4 text-right">
+                      <span ngbTooltip="0x{{t.topics[1] | slice:26 }}"><b>to:</b> 0x{{t.topics[1] | slice:26 | hashShortener:4}}</span>
+                    </div>
+                </div>
 
-                  <button  (click)="openModal(i, false)"> Challenge this</button>
+                <div class="row mt-3">
+                    <div class="col-md-6 text-left">
+                      <span class="token-id"><b>Challenge period ends at</b> {{t.challengeEnd | date:'short'}}</span>
+                    </div>
+                    <div class="col-md-6 text-right">
+                      <button class="btn btn-sm btn-primary"  (click)="openModal(i, false)">Challenge this</button>
+                    </div>
+                </div>
               </li>
             </ul>
           </div>
           <div *ngIf="withdrawals.length == 0">
-              <p>No challengeable withdrawals found</p>
-            </div>
-
-        </div>
-
-        <div *ngIf="transactionHash != ''" class="col-md-12 mt-3">
-          <p><b>tx hash:</b> <a href="https://ropsten.etherscan.io/tx/{{transactionHash}}">{{transactionHash}}</a></p>
+            <p>No challengeable withdrawals found</p>
+          </div>
         </div>
       </ng-template>
     </ngb-tab>
-    <ngb-tab title="Pending challenges">
+    <ngb-tab>
+      <ng-template ngbTabTitle>
+          <div class="tab-title" (click)="tabSwitch('pending')">Pending challenges<span [className]="isPendingRefreshing?'glyphicon glyphicon-refresh fast-right-spinner':'glyphicon glyphicon-refresh'"  (click) = "refreshTab('pending')"></span></div>
+      </ng-template>
+
       <ng-template ngbTabContent>
         <div *ngIf="challenges.length > 0">
           <ul class="list-group transactions">
             <li *ngFor="let t of challenges; let i = index" class="list-group-item">
-                <span class=""><b>txHash:</b> {{t.transactionHash}}</span>
-                <span class="block-number"><b>block:</b> {{t.blockNumber}}</span>
-                <span class="to-address"><b>to:</b> 0x{{t.topics[1] | slice:26}}</span>
-                <span class="token-id"><b>token id:</b> {{t.data}}</span>
-                <button (click)="openModal(i, true)">Send proof of custody</button>
+              <div class="row">
+                <div class="col-md-4 text-left">
+                  <span ngbTooltip="{{t.data}}"><b>token id:</b> {{t.data | hashShortener:8}}</span>
+                </div>
+
+                <div class="col-md-4 text-center">
+                  <span ngbTooltip="{{t.transactionHash}}"><b>txHash:</b> {{t.transactionHash | hashShortener:8}}</span>
+                </div>
+
+                <div class="col-md-4  text-right">
+                  <span><b>block:</b> {{t.blockNumber}}</span>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 text-left">
+                  <span ngbTooltip="0x{{t.topics[1] | slice:26 }}"><b>challenger:</b> 0x{{t.topics[1] | slice:26 | hashShortener:8}}</span>
+                </div>
+                <div class="col-md-6 text-right">
+                  <span ngbTooltip="0x{{t.topics[2] | slice:26 }}"><b>deposited to:</b> 0x{{t.topics[2] | slice:26 | hashShortener:8}}</span>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                  <div class="col-md-12 text-right">
+                    <button class="btn btn-sm btn-primary"  (click)="openModal(i, true)">Send proof of custody</button>
+                  </div>
+              </div>
             </li>
           </ul>
         </div>
+
         <div *ngIf="challenges.length == 0">
           <p>No pending challenges found</p>
         </div>
       </ng-template>
     </ngb-tab>
   </ngb-tabset>
+
+  <div *ngIf="transactionHash != ''" class="col-md-12 mt-3 text-center">
+    <ngb-alert [type]="'success'" [dismissible]="false">
+      <h5>The transaction was successful </h5>
+      <b>tx hash:</b> {{transactionHash}} <a href="https://ropsten.etherscan.io/tx/{{transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+    </ngb-alert>
+
+    <div *ngIf="challengerReward > 0">
+      <h4>Challenge was successful</h4>
+      <p>You were rewarded with <b>{{challengerReward}} WEI</b></p>
+    </div>
+    <div *ngIf="challengerReward <= 0 && challengeType=='future'">
+        <h4>Challenge failed</h4>
+    </div>
+    <button class="btn btn-sm btn-primary"  (click)="newChallenge()">Done</button>
+  </div>
 
 
 
@@ -74,15 +131,51 @@
       X
     </div>
 
-    <h4 class="text-center">Challenge</h4>
+    <h4 class="text-center mb-3">Challenge</h4>
 
-    <div class="form-group mt-3">
-      <label for="transferTx">Tranfer transaction hash</label>
-      <input type="text" class="form-control" id="transferTx" name="transferTx" placeholder="0x000...000" [(ngModel)]="transferTxHash">
-    </div>
-    <div class="form-group mt-3">
-      <label for="approvalTx">Custodian approval hash</label>
-      <input type="text" class="form-control" id="approvalTx" name="approvalTx" placeholder="0x000...000" [(ngModel)]="approvalTxHash">
+    <ngb-alert *ngIf="suspiciousWithdrawal" [type]="'warning'" [dismissible]="false" class="text-center">
+        <span><b>Token: </b> {{suspiciousWithdrawal.token | hashShortener:6 }}</span><br>
+        <span><b *ngIf='!isResponse'>Withdrawn by: </b><b *ngIf='isResponse'>Challenger: </b> {{suspiciousWithdrawal.to | hashShortener:4 }}</span><br>
+        <div *ngIf='isResponse'>
+          <span><b>Challenge End Nonce </b> {{suspiciousWithdrawal.challengeEndNonce}} / <b>Last Proven Nonce </b> {{suspiciousWithdrawal.lastProvenNonce}}</span><br>
+        </div>
+    </ngb-alert>
+
+    <h5 class="mb-0">Select your proof below:</h5>
+    <div class="proof-container">
+
+      <p *ngIf="proofs.length == 0" class="text-center">
+        Loading proofs. Please wait.
+        <span class="glyphicon glyphicon-refresh fast-right-spinner"></span>
+      </p>
+
+      <ul class="list-group transactions">
+        <li *ngFor="let p of proofs; let i = index" class="list-group-item" [ngClass]="{'active': selectedProofIdx === i }" (click)="selectProof(i)">
+          <div class="row">
+              <div class="col-md-12">
+                  <span><b>Nonce:</b> {{p.nonce}}</span>
+                </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <span><b>From:</b> {{p.from | hashShortener:4 }}</span>
+            </div>
+            <div class="col-md-6">
+              <span><b>To:</b> {{p.to | hashShortener:4 }}</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <span><b>Transfer hash:</b> {{p.transferHash | hashShortener:6 }}<br>at block nr {{p.transferBlock}}</span>
+            </div>
+            <div class="col-md-6">
+                <span><b>Approval hash:</b> {{p.approvalHash | hashShortener:6 }}<br>at block nr {{p.approvalBlock}}</span>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
 
     <div *ngIf="isResponse == false">
@@ -96,7 +189,7 @@
 
 
     <div class="text-center">
-      <button (click)="challenge()">Challenge</button>
+      <button class="btn btn-primary" (click)="challenge()" [disabled]="selectedProofIdx == -1">Challenge</button>
     </div>
 
   </div>

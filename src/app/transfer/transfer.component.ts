@@ -49,9 +49,7 @@ export class TransferComponent implements OnInit, OnDestroy {
 
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
-      console.log('connected network', connectedNetwork);
-
-      if (connectedNetwork !== 'kovan') {
+      if (connectedNetwork !== 'ethereum') {
         this.loaderMessage = 'Please connect to the foreign netwok!';
         return;
       }
@@ -72,37 +70,45 @@ export class TransferComponent implements OnInit, OnDestroy {
       this.loaderMessage = 'Getting the tokenIds';
       this.isLoading = true;
 
-      const res = await this._bs.getTransferEventsFromTokenContract(1);
-      const res1 = await this._bs.getTransferRequestEventsFromTokenContract(1);
-
+      this.tokens = [];
       const currentAddress = this._bs.getCurrentAddress();
-      let tokens: any[] = [];
-      let sentTokens: any[] = [];
 
+      let tokens: any[] = await this._bs.getTransferEventsFromTokenContract(1, null, currentAddress);
+      let sentTokens: any[] = await this._bs.getTransferEventsFromTokenContract(1, currentAddress, null);
+      let withdrawnTokens: any[] = await this._bs.getWithdrawEventsFromTokenContract(1, currentAddress);
 
-
-      for (let i = 0; i < res.length; i++) {
-       if ('0x' + res[i].topics[2].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
-          tokens.push(res[i].topics[3]);
-        }
-        if ('0x' + res[i].topics[1].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
-          sentTokens.push(res[i].topics[3]);
-        }
-      }
-
+      let filtered: any[] = [];
+      // filter out sent tokens
       for (let i = 0; i < tokens.length; i++) {
         let match = false;
         for (let j = 0; j < sentTokens.length; j++ ) {
-          if (tokens[i] === sentTokens[j]) {
+          if (tokens[i].topics[3] === sentTokens[j].topics[3]) {
             sentTokens.splice(j, 1);
             match = true;
             break;
           }
         }
         if (!match) {
-          this.tokens.push(tokens[i]);
+          filtered.push(tokens[i].topics[3]);
         }
       }
+
+      // filter out withdrawn tokens
+      for (let i = 0; i < filtered.length; i++) {
+        let match = false;
+        for (let j = 0; j < withdrawnTokens.length; j++ ) {
+          if (filtered[i] === withdrawnTokens[j].topics[1]) {
+            withdrawnTokens.splice(j, 1);
+            match = true;
+            break;
+          }
+        }
+        if (!match) {
+          this.tokens.push(filtered[i]);
+        }
+      }
+
+
       this.isLoading = false;
     }
 

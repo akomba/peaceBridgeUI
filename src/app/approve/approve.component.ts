@@ -29,7 +29,7 @@ export class ApproveComponent implements OnInit, OnDestroy {
 
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
-      if (connectedNetwork !== 'kovan') {
+      if (connectedNetwork !== 'ethereum') {
         this.loaderMessage = 'Please connect to the foreign netwok!';
         return;
       }
