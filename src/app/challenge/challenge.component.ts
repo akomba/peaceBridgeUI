@@ -229,7 +229,7 @@ export class ChallengeComponent implements OnInit {
           challengeType = 'response';
         }
 
-        const balance = await this._bs.getBalanceForCurrentAccount();
+        const balance:any = await this._bs.getBalanceForCurrentAccount();
 
         try {
           const challengeEndNonce = await this._bs.getChallengeEndNonce(tokenId);
@@ -238,7 +238,7 @@ export class ChallengeComponent implements OnInit {
           this.isLoading = false;
 
           if (this.challengeType === 'future' || this.challengeType === 'response') {
-            const newBalance = await this._bs.getBalanceForCurrentAccount();
+            const newBalance:any = await this._bs.getBalanceForCurrentAccount();
             if (newBalance > balance) {
               // challenge was succesful
               this.challengerReward = newBalance - balance;
