@@ -38,6 +38,8 @@ export class ChallengeComponent implements OnInit {
     public isResponse = false;
 
     public challengerReward = 0;
+    public depositContractAddr = '';
+
 
     constructor(public _bs: BridgeService, private _router: Router) {}
 
@@ -50,13 +52,16 @@ export class ChallengeComponent implements OnInit {
       const now = new Date().getTime();
 
       if (connectedNetwork !== 'classic') {
-        this.loaderMessage = 'Please connect to the home netwok!';
+        this.loaderMessage = 'Please connect to the home network!';
       } else {
         this.loaderMessage = 'Collecting withdrawals';
         await this.getWithdrawals();
         // await this.getPendingChallenges();
         this.isLoading = false;
       }
+
+      this.depositContractAddr = this._bs.getDepositContractAddr();
+
     }
 
     public async getWithdrawals() {

@@ -22,6 +22,8 @@ export class ClaimComponent implements OnInit {
     public tokenIdIdx = -1;
     private accountChangeRef: Subscription = null;
 
+    public depositContractAddr = '';
+
 
     constructor(public _bs: BridgeService, private _router: Router, private zone: NgZone) {}
 
@@ -30,7 +32,7 @@ export class ClaimComponent implements OnInit {
       this.loaderMessage = 'Connecting to network';
       const connectedNetwork = await this._bs.getConnectedNetwork();
       if (connectedNetwork !== 'classic') {
-        this.loaderMessage = 'Please connect to the home netwok!';
+        this.loaderMessage = 'Please connect to the home network!';
         return;
       }
 
@@ -43,6 +45,8 @@ export class ClaimComponent implements OnInit {
           this.getTokens();
           });
       });
+      this.depositContractAddr = this._bs.getDepositContractAddr();
+
     }
 
 
@@ -106,7 +110,7 @@ export class ClaimComponent implements OnInit {
 
       } catch (e) {
           if (e.message.indexOf('reverted by the EVM') > -1) {
-            this.errorMessage = 'Transaction reverted by EVM. Is the challenge period ended yet?';
+            this.errorMessage = 'Transaction reverted by EVM. Has the challenge period ended yet?';
           } else {
               this.errorMessage = e.message;
           }

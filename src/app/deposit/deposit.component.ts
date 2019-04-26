@@ -15,6 +15,8 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     public isLoading = false;
 
+    public depositContractAddr = '';
+
     public loaderMessage = '';
     public transactionHash = '';
     public minterAddress = '';
@@ -34,11 +36,13 @@ export class DepositComponent implements OnInit, OnDestroy {
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'classic') {
-        this.loaderMessage = 'Please connect to the home netwok!';
+        this.loaderMessage = 'Please connect to the home network!';
         return;
       } else {
         this.isLoading = false;
       }
+
+      this.depositContractAddr = this._bs.getDepositContractAddr();
 
       /* if (this._bs.getCurrentAddress() !== '') {
         this.getTokens();

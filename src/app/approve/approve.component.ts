@@ -20,6 +20,8 @@ export class ApproveComponent implements OnInit, OnDestroy {
 
     public isApproveFinished = false;
 
+    public tokenContractAddr = '';
+
     constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute) {
     }
 
@@ -30,12 +32,13 @@ export class ApproveComponent implements OnInit, OnDestroy {
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'ethereum') {
-        this.loaderMessage = 'Please connect to the foreign netwok!';
+        this.loaderMessage = 'Please connect to the foreign network!';
         return;
       }
 
       this.loaderMessage = 'Getting the latest transactions';
       this.getTransfers();
+      this.tokenContractAddr = this._bs.getTokenContractAddr();
     }
 
     public ngOnDestroy(): void {

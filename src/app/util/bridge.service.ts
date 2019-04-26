@@ -13,7 +13,8 @@ const Hash: any = require('eth-lib/lib/hash');
 const queryRange = 50000; // in blocks...
 
 const tokenContractAddr = '0x20dD16A7CFb58b1a61a79CC0FD014342e75C16c7';
-const depositContractAddr = '0x2Ac55CA0a8CD28B4355bc7737B41aAd3f0117904';
+// const depositContractAddr = '0x2Ac55CA0a8CD28B4355bc7737B41aAd3f0117904'; //Ropsten
+const depositContractAddr = '0x5295f37f1b570e544d3171549ceadd74de88f004'; //Kotti
 
 declare var require: any;
 declare let window: any;
@@ -78,7 +79,8 @@ export class BridgeService {
 
       if (typeof window.web3 !== 'undefined') {
 
-        this.web3 = new Web3(window.web3.currentProvider);
+        // this.web3 = new Web3(window.web3.currentProvider);
+        this.web3 = new Web3(new Web3.providers.HttpProvider('https://kotti.ethereumclassic.network'));
         this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
         // get the first account
@@ -261,6 +263,14 @@ export class BridgeService {
       return this.selectedAddress;
     }
     return '';
+  }
+
+  public getTokenContractAddr(){
+      return tokenContractAddr;
+  }
+
+  public getDepositContractAddr(){
+      return depositContractAddr;
   }
 
   public getBalanceForCurrentAccount() {

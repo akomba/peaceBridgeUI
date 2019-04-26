@@ -21,6 +21,8 @@ export class MintComponent implements OnInit {
     public mintedTokenId = '';
     public txHash = '';
 
+    public tokenContractAddr = '';
+
     constructor(public _bs: BridgeService, private _router: Router) {}
 
     async ngOnInit() {
@@ -31,9 +33,10 @@ export class MintComponent implements OnInit {
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'ethereum') {
-        this.loaderMessage = 'Please connect to the foreign netwok!';
+        this.loaderMessage = 'Please connect to the foreign network!';
         return;
       }
+      this.tokenContractAddr = this._bs.getTokenContractAddr();
       this.isLoading = false;
      }
 

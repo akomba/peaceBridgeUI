@@ -44,7 +44,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
       if (time !== null && now - parseInt(time, 10) < expirationTime ) {
         this.isLoading = true;
         if (connectedNetwork !== 'classic') {
-          this.loaderMessage = 'Please connect to the home netwok!';
+          this.loaderMessage = 'Please connect to the home network!';
         } else {
           // popup with address change
           this.accountCheckerVisible = true;
@@ -53,7 +53,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
       } else {
         if (connectedNetwork !== 'ethereum') {
           this.isLoading = true;
-          this.loaderMessage = 'Please connect to the foreign netwok!';
+          this.loaderMessage = 'Please connect to the foreign network!';
         } else {
 
 
@@ -150,7 +150,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       await this.waitForNetwork('ethereum');
 
-      this.loaderMessage = 'Withdraw on tonken contract';
+      this.loaderMessage = 'Withdraw on token contract';
 
       try {
 
@@ -266,7 +266,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     private async waitForNetwork(targetNetwork: string ) {
       const connectedNetwork = await this._bs.getConnectedNetwork();
       if (connectedNetwork !== targetNetwork) {
-        this.loaderMessage = 'Please connect to the ' + ((targetNetwork === 'classic') ? 'home' : 'foreign') + ' netwok!';
+        this.loaderMessage = 'Please connect to the ' + ((targetNetwork === 'classic') ? 'home' : 'foreign') + ' network!';
         const delay = new Promise(resolve => setTimeout(resolve, 300));
         await delay;
         return await this.waitForNetwork(targetNetwork);

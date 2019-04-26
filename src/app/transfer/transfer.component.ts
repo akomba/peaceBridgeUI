@@ -26,6 +26,9 @@ export class TransferComponent implements OnInit, OnDestroy {
     private subscription: any;
     private accountChangeRef: Subscription = null;
 
+    public tokenContractAddr = '';
+
+
     constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute, private zone: NgZone) {
     }
 
@@ -44,13 +47,15 @@ export class TransferComponent implements OnInit, OnDestroy {
         }
       });
 
+      this.tokenContractAddr = this._bs.getTokenContractAddr();
+
       this.isLoading = true;
       this.loaderMessage = 'Connecting to network';
 
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'ethereum') {
-        this.loaderMessage = 'Please connect to the foreign netwok!';
+        this.loaderMessage = 'Please connect to the foreign network!';
         return;
       }
 
