@@ -102,7 +102,8 @@ export class BridgeService {
 
         this.tokenContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
         this.tokenContractInfuraWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
-        this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
+        // this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
+        this.depositContractWeb3 = new this.homeWeb3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
 
 
         this.web3.eth.net.getId().then(netId => {
@@ -344,19 +345,26 @@ export class BridgeService {
 
 
   public async getDepositEventsFromDepositContract(startBlock?: number) {
-    return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
+    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
+
   }
 
   public async getChallengeInitiatedEventsFromDepositContract(startBlock?: number) {
-    return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
+    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
+
   }
 
   public async getResolvedChallenges(startBlock?: number) {
-    return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
+    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
+
   }
 
   public async getWithdrawalEventsFromDepositContract(startBlock?: number) {
-    return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Withdrawal().options.params.topics[0]], (startBlock) ? startBlock : null );
+    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Withdrawal().options.params.topics[0]], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.Withdrawal().options.params.topics[0]], (startBlock) ? startBlock : null );
   }
 
   public async getW3EventLog(w3, contractAddress, topic, startBlock?) {
@@ -406,7 +414,8 @@ export class BridgeService {
 
   /* Utils */
   public async generateRawTxAndMsgHash (_txHash, onForeignNetwork = false) {
-    let w3 = this.web3;
+    // let w3 = this.web3;
+    let w3 = this.homeWeb3;
 
     if (onForeignNetwork === true) {
       w3 = this.foreignWeb3;
