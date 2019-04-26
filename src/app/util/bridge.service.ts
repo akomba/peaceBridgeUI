@@ -56,7 +56,7 @@ export class BridgeService {
   // providers
   private web3: Web3 = null;
   private foreignWeb3: Web3 = null;
-  // private homeWeb3: Web3 = null;
+  private homeWeb3: Web3 = null;
 
   constructor() {
     this.accountChange = new Subject<string>();
@@ -68,6 +68,7 @@ export class BridgeService {
   }
 
   public async intBridge() {
+
       if (window.ethereum) {
         window.web3 = new Web3(window.ethereum);
         try {
@@ -79,8 +80,8 @@ export class BridgeService {
 
       if (typeof window.web3 !== 'undefined') {
 
-        // this.web3 = new Web3(window.web3.currentProvider);
-        this.web3 = new Web3(new Web3.providers.HttpProvider('https://kotti.ethereumclassic.network'));
+        this.web3 = new Web3(window.web3.currentProvider);
+        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://kotti.ethereumclassic.network'));
         this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
         // get the first account
