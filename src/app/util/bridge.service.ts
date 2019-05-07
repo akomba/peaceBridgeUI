@@ -14,7 +14,7 @@ const queryRange = 50000; // in blocks...
 
 const tokenContractAddr = '0x20dD16A7CFb58b1a61a79CC0FD014342e75C16c7';
 // const depositContractAddr = '0x2Ac55CA0a8CD28B4355bc7737B41aAd3f0117904'; //Ropsten
-const depositContractAddr = '0x5295f37f1b570e544d3171549ceadd74de88f004'; //Kotti
+const depositContractAddr = '0x3fb03455923341b0176947e395f46d086c38fe7d'; //Kotti
 
 declare var require: any;
 declare let window: any;
