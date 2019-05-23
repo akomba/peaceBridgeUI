@@ -134,9 +134,9 @@ export class TransferComponent implements OnInit, OnDestroy {
         // transfer
         try {
 
-          if (this.toAdress.toLowerCase() === this._bs.getCurrentAddress().toLowerCase()) {
-            throw({message: 'You can\'t send tokens to yourself'});
-          }
+          // if (this.toAdress.toLowerCase() === this._bs.getCurrentAddress().toLowerCase()) {
+          //   throw({message: 'You can\'t send tokens to yourself'});
+          // }
 
           const txNonce = await this._bs.getTransferNonce(this.tokenId);
 

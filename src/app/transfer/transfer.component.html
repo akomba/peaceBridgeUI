@@ -9,7 +9,9 @@
           <label for="token-id">Token ID</label>
           <select name="token-id" class="form-control" [(ngModel)]="tokenIdIdx">
               <option value="-1">none</option>
-              <option *ngFor="let t of tokens; let i = index" value="{{i}}">{{t | hashShortener:6}}</option>
+              <option *ngFor="let t of tokens; let i = index" value="{{i}}">
+                {{t | hashShortener:20}}
+              </option>
           </select>
 
 

@@ -13,8 +13,10 @@ const Hash: any = require('eth-lib/lib/hash');
 const queryRange = 50000; // in blocks...
 
 const tokenContractAddr = '0x20dD16A7CFb58b1a61a79CC0FD014342e75C16c7';
-// const depositContractAddr = '0x2Ac55CA0a8CD28B4355bc7737B41aAd3f0117904'; //Ropsten
-const depositContractAddr = '0x3fb03455923341b0176947e395f46d086c38fe7d'; //Kotti
+const depositContractAddr = '0x2Ac55CA0a8CD28B4355bc7737B41aAd3f0117904'; //Ropsten
+const homeBlockExplorer = 'ropsten.etherscan.io';
+// const depositContractAddr = '0x3fb03455923341b0176947e395f46d086c38fe7d'; //Kotti
+// const homeBlockExplorer = 'kottiexplorer.ethernode.io';
 
 declare var require: any;
 declare let window: any;
@@ -56,7 +58,6 @@ export class BridgeService {
   // providers
   private web3: Web3 = null;
   private foreignWeb3: Web3 = null;
-  private homeWeb3: Web3 = null;
 
   constructor() {
     this.accountChange = new Subject<string>();
@@ -81,7 +82,6 @@ export class BridgeService {
       if (typeof window.web3 !== 'undefined') {
 
         this.web3 = new Web3(window.web3.currentProvider);
-        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://kotti.ethereumclassic.network'));
         this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
         // get the first account
@@ -102,9 +102,7 @@ export class BridgeService {
 
         this.tokenContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
         this.tokenContractInfuraWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
-        // this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
-        this.depositContractWeb3 = new this.homeWeb3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
-
+        this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
 
         this.web3.eth.net.getId().then(netId => {
 
@@ -242,6 +240,10 @@ export class BridgeService {
 
   /* Getters */
 
+  public getHomeBlockExplorer(){
+    return homeBlockExplorer;
+  }
+
   public async getConnectedNetwork() {
     if (this.connectedNetwork === '') {
       const delay = new Promise(resolve => setTimeout(resolve, 300));
@@ -345,26 +347,26 @@ export class BridgeService {
 
 
   public async getDepositEventsFromDepositContract(startBlock?: number) {
-    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
-
+    let topic: any[] = [this.web3.utils.sha3('Deposit(address,uint256,uint256,address)'), null, null, null];
+    return this.getW3EventLog(this.web3, depositContractAddr, topic, (startBlock) ? startBlock : null );
   }
 
   public async getChallengeInitiatedEventsFromDepositContract(startBlock?: number) {
     // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
 
   }
 
   public async getResolvedChallenges(startBlock?: number) {
     // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
 
   }
 
   public async getWithdrawalEventsFromDepositContract(startBlock?: number) {
+    let topic: any[] = [this.web3.utils.sha3('Withdrawal(address,uint256,uint256,uint256)'), null, null, null];
     // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Withdrawal().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.Withdrawal().options.params.topics[0]], (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.web3, depositContractAddr, topic, (startBlock) ? startBlock : null );
   }
 
   public async getW3EventLog(w3, contractAddress, topic, startBlock?) {
@@ -414,8 +416,7 @@ export class BridgeService {
 
   /* Utils */
   public async generateRawTxAndMsgHash (_txHash, onForeignNetwork = false) {
-    // let w3 = this.web3;
-    let w3 = this.homeWeb3;
+    let w3 = this.web3;
 
     if (onForeignNetwork === true) {
       w3 = this.foreignWeb3;
@@ -522,7 +523,8 @@ export class BridgeService {
       bytes32Bundle[Math.floor(i / 64)] = (bytes32Bundle[Math.floor(i / 64)]) ? bytes32Bundle[Math.floor(i / 64)] + rawBundle[i] : rawBundle[i] ;
     }
     bytes32Bundle.forEach((value, index) => {
-      bytes32Bundle[index] = '0x' + bytes32Bundle[index];
+      bytes32Bundle[index] = '0x' + bytes32Bundle[index]
+      // bytes32Bundle[index] = '0x' + bytes32Bundle[index].padEnd(64, '0');
       // padding if shorter than 32
       while (bytes32Bundle[index].length < 66) { bytes32Bundle[index] += '0'; }
       if (bytes32Bundle[index].length !== 66) { throw new Error('invalid web3 implicit bytes32'); }

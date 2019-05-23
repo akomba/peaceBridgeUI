@@ -1,6 +1,9 @@
 <div class="row">
   <div class="col-md-12">
     <h1 class="display-4 text-center">Withdraw</h1>
+    <b>Token Contract address:</b> {{tokenContractAddr}} <a href="https://kovan.etherscan.io/address/{{tokenContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a><br>
+    <b>Deposit Contract address:</b> {{depositContractAddr}} <a href="https://{{_bs.getHomeBlockExplorer()}}/address/{{depositContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>  
+  
   </div>
 </div>
 
@@ -22,10 +25,16 @@
               <li *ngFor="let t of tokens; let i = index" class="list-group-item">
                 <div class="row">
                   <div class="col-md-5">
-                    <span class="token-id" ngbTooltip="{{t.topics[3]}}"><b>token id:</b> {{t.topics[3] | hashShortener:6}}</span>
+                    <span class="token-id" ngbTooltip="{{t.topics[3]}}">
+                      <b>token id:</b> {{t.topics[3] | hashShortener:6}}
+                      <!-- <a href="https://kovan.etherscan.io/token/{{t.topics[3]}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a> -->
+                    </span>
                   </div>
                   <div class="col-md-5">
-                    <span class="minter-address" ngbTooltip="{{t.transactionHash}}"><b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}</span>
+                    <span class="minter-address" ngbTooltip="{{t.transactionHash}}">
+                      <b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}
+                      <a href="https://kovan.etherscan.io/tx/{{t.transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+                    </span>
                   </div>
                   <div class="col-md-2 text-right">
                     <button class="btn btn-sm btn-primary" (click)="withdraw(i)">Withdraw</button>
@@ -49,14 +58,17 @@
               <ul class="list-group transactions">
                 <li *ngFor="let t of withdrawnTokens; let i = index" class="list-group-item">
                   <div class="row">
-                    <div class="col-md-5">
-                      <span class="token-id" ngbTooltip="{{t.topics[3]}}"><b>token id:</b> {{t.topics[3] | hashShortener:6}}</span>
+                    <div class="col-md-6">
+                      <span class="token-id" ngbTooltip="{{t.topics[3]}}">
+                        <b>token id:</b> {{t.topics[3] | hashShortener:10}}
+                        <!-- <a href="https://kovan.etherscan.io/token/{{t.topics[3]}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a> -->
+                      </span>
                     </div>
-                    <div class="col-md-5">
-                      <span class="minter-address" ngbTooltip="{{t.transactionHash}}"><b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}</span>
-                    </div>
-                    <div class="col-md-2 text-right">
-                      <button class="btn btn-sm btn-primary" (click)="withdraw(i)">Withdraw</button>
+                    <div class="col-md-6">
+                      <span class="minter-address" ngbTooltip="{{t.transactionHash}}">
+                        <b>Approval hash:</b> {{t.transactionHash | hashShortener:6}}
+                        <a href="https://kovan.etherscan.io/tx/{{t.transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+                      </span>
                     </div>
                   </div>
                 </li>
@@ -82,7 +94,7 @@
 
   <div *ngIf="resultHash != ''" class="col-md-12 mt-3 text-center">
     <ngb-alert [type]="'success'" [dismissible]="false">
-      <b>tx hash:</b> {{resultHash}} <a href="https://ropsten.etherscan.io/tx/{{resultHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+      <b>tx hash:</b> {{resultHash}} <a href="https://{{_bs.getHomeBlockExplorer()}}/tx/{{resultHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
     </ngb-alert>
   </div>
 

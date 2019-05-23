@@ -1,8 +1,7 @@
 <div class="row">
     <div class="col-md-12">
         <h1 class="display-4 text-center">Claim / Claim Stake</h1>
-      <!-- <b>Deposit Contract address:</b> {{depositContractAddr}} <a href="https://ropsten.etherscan.io/address/{{depositContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a> -->
-      <b>Deposit Contract address:</b> {{depositContractAddr}} <a href="https://kottiexplorer.ethernode.io/address/{{depositContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+      <b>Deposit Contract address:</b> {{depositContractAddr}} <a href="https://{{_bs.getHomeBlockExplorer()}}/address/{{depositContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
     </div>
 
     <ngb-tabset>
@@ -54,7 +53,7 @@
 
   <div *ngIf="transactionHash != ''" class="col-md-12 mt-3 text-center">
     <ngb-alert [type]="'success'" [dismissible]="false">
-      <b>tx hash:</b> {{transactionHash}} <a href="https://ropsten.etherscan.io/tx/{{transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+      <b>tx hash:</b> {{transactionHash}} <a href="https://{{_bs.getHomeBlockExplorer()}}/tx/{{transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
     </ngb-alert>
   </div>
 

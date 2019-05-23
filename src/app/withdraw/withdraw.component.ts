@@ -31,6 +31,9 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     public tokens: any [] = [];
     public withdrawnTokens: any [] = [];
 
+    public tokenContractAddr = '';
+    public depositContractAddr = '';
+
     private accountChangeRef: Subscription = null;
 
     constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute, private zone: NgZone) {
@@ -70,6 +73,9 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
         }
       }
+      this.tokenContractAddr = this._bs.getTokenContractAddr();
+      this.depositContractAddr = this._bs.getDepositContractAddr();
+
     }
 
     public ngOnDestroy(): void {
@@ -96,9 +102,9 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
       // filter mints
       for (let i = 0; i < allIncoming.length; i++) {
-        if (allIncoming[i].topics[1] !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+        // if (allIncoming[i].topics[1] !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
           incoming.push(allIncoming[i]);
-        }
+        // }
       }
 
       // filter outgoing transfers
@@ -177,7 +183,6 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         }
 
         const tx: any = await this._bs.withdraw(this.tokenId);
-
 
         this.withdrawTxHash = tx.transactionHash;
 
