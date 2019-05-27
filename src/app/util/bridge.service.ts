@@ -81,7 +81,8 @@ export class BridgeService {
       if (typeof window.web3 !== 'undefined') {
 
         this.web3 = new Web3(window.web3.currentProvider);
-        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://kotti.ethereumclassic.network'));
+//        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://kotti.ethereumclassic.network'));
+        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
         this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
 
         // get the first account
@@ -346,7 +347,8 @@ export class BridgeService {
 
   public async getDepositEventsFromDepositContract(startBlock?: number) {
     // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
+    let topic: any[] = [this.homeWeb3.utils.sha3('Deposit(address,uint256,uint256,address)'), null, null, null];
+    return this.getW3EventLog(this.homeWeb3, depositContractAddr, topic, (startBlock) ? startBlock : null );
 
   }
 

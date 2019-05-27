@@ -126,6 +126,12 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     private async getDepositEvents() {
       const res = await this._bs.getDepositEventsFromDepositContract(1);
+
+
+      console.log("DEPOSIT EVENTS", res);
+
+
+
       const currentAddress = this._bs.getCurrentAddress();
 
       let eventsLog: any[] = [];
