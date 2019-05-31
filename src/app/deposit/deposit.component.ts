@@ -127,23 +127,18 @@ export class DepositComponent implements OnInit, OnDestroy {
     private async getDepositEvents() {
       const res = await this._bs.getDepositEventsFromDepositContract(1);
 
-
-      console.log("DEPOSIT EVENTS", res);
-
-
-
       const currentAddress = this._bs.getCurrentAddress();
 
       let eventsLog: any[] = [];
 
       for (let i = 0; i < res.length; i++) {
-     //  if ('0x' + res[i].topics[1].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
+       // if ('0x' + res[i].topics[1].slice(26).toLowerCase() === currentAddress.toLowerCase()) {
             eventsLog.push({
             tokenId: '0x' + res[i].data.slice(66, 130),
             amount: parseInt(res[i].data.slice(2, 66), 16),
             minter: '0x' + res[i].topics[1].slice(26)
           });
-      //  }
+        //}
       }
 
       return eventsLog;

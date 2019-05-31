@@ -1,10 +1,28 @@
 <div class="row">
   <div class="col-md-12">
     <h1 class="display-4 text-center">Withdraw</h1>
+
+    <div class="row mt-4">
+
+      <div class="col-md-6 contract-container">
+        <h5>Token Contract address:</h5>
+        <p class="hash mb-0 mt-1" ngxClipboard [cbContent]="tokenContractAddr"><span ngbTooltip="Click to copy to clipboard">{{tokenContractAddr}}</span>
+          <a href="https://{{_bs.getForeignBlockExplorer()}}/address/{{tokenContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+        </p>
+      </div>
+
+      <div class="col-md-6 contract-container">
+        <h5>Deposit Contract address:</h5>
+        <p class="hash mb-0 mt-1" ngxClipboard [cbContent]="depositContractAddr"><span ngbTooltip="Click to copy to clipboard">{{depositContractAddr}}</span>
+          <a href="https://{{_bs.getHomeBlockExplorer()}}/address/{{depositContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+        </p>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<div class="row">
+<div class="row mt-5">
 
 <!--   <div class="col-md-12">
     <div class="form-group">
@@ -22,10 +40,14 @@
               <li *ngFor="let t of tokens; let i = index" class="list-group-item">
                 <div class="row">
                   <div class="col-md-5">
-                    <span class="token-id" ngbTooltip="{{t.topics[3]}}"><b>token id:</b> {{t.topics[3] | hashShortener:6}}</span>
+                    <span class="token-id" ngbTooltip="{{t.topics[3]}}">
+                      <b>token id:</b> {{t.topics[3] | hashShortener:6}}
+                    </span>
                   </div>
                   <div class="col-md-5">
-                    <span class="minter-address" ngbTooltip="{{t.transactionHash}}"><b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}</span>
+                    <span class="minter-address" ngbTooltip="{{t.transactionHash}}">
+                      <b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}</span>
+                      <a href="https://{{_bs.getForeignBlockExplorer()}}/tx/{{t.transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
                   </div>
                   <div class="col-md-2 text-right">
                     <button class="btn btn-sm btn-primary" (click)="withdraw(i)">Withdraw</button>
@@ -50,10 +72,14 @@
                 <li *ngFor="let t of withdrawnTokens; let i = index" class="list-group-item">
                   <div class="row">
                     <div class="col-md-5">
-                      <span class="token-id" ngbTooltip="{{t.topics[3]}}"><b>token id:</b> {{t.topics[3] | hashShortener:6}}</span>
+                      <span class="token-id" ngbTooltip="{{t.topics[3]}}">
+                        <b>token id:</b> {{t.topics[3] | hashShortener:10}}</span>
                     </div>
                     <div class="col-md-5">
-                      <span class="minter-address" ngbTooltip="{{t.transactionHash}}"><b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}</span>
+                      <span class="minter-address" ngbTooltip="{{t.transactionHash}}">
+                        <b>Approval hash:</b> {{t.transactionHash | hashShortener:4}}
+                        <a href="https://{{_bs.getForeignBlockExplorer()}}/tx/{{t.transactionHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+                      </span>
                     </div>
                     <div class="col-md-2 text-right">
                       <button class="btn btn-sm btn-primary" (click)="withdraw(i)">Withdraw</button>
@@ -82,7 +108,7 @@
 
   <div *ngIf="resultHash != ''" class="col-md-12 mt-3 text-center">
     <ngb-alert [type]="'success'" [dismissible]="false">
-      <b>tx hash:</b> {{resultHash}} <a href="https://ropsten.etherscan.io/tx/{{resultHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+      <b>tx hash:</b> {{resultHash}} <a href="https://{{_bs.getHomeBlockExplorer()}}/tx/{{resultHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
     </ngb-alert>
   </div>
 

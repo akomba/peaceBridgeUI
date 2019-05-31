@@ -471,671 +471,671 @@ export const contractAbis = {
 ]`,
   depositAbi: `[
     {
-        "constant": true,
-        "inputs": [
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
+        "outputs": [
             {
-                "name": "",
-                "type": "uint256"
+                "type": "uint256",
+                "name": ""
             }
         ],
         "name": "challengeTime",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "depositedAmount",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
         "inputs": [
             {
-                "name": "",
-                "type": "uint256"
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "constant": true
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "name": "depositedAmount",
+        "inputs": [],
+        "constant": true
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
+        "outputs": [
+            {
+                "type": "address",
+                "name": ""
             }
         ],
         "name": "tokenIdToMinter",
-        "outputs": [
+        "inputs": [
             {
-                "name": "",
-                "type": "address"
+                "type": "uint256",
+                "name": ""
             }
         ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
+        "constant": true
     },
     {
-        "constant": false,
-        "inputs": [],
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "outputs": [],
         "name": "finalizeStake",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
+        "inputs": [],
+        "constant": false
     },
     {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "name": "_tokenId",
-                "type": "uint256"
-            },
-            {
-                "name": "_rawTxBundle",
-                "type": "bytes32[]"
-            },
-            {
-                "name": "_txLengths",
-                "type": "uint256[]"
-            },
-            {
-                "name": "_txMsgHashes",
-                "type": "bytes32[]"
-            }
-        ],
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "outputs": [],
         "name": "challengeWithPastCustody",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_to"
+            },
+            {
+                "type": "uint256",
+                "name": "_tokenId"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_rawTxBundle"
+            },
+            {
+                "type": "uint256[]",
+                "name": "_txLengths"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_txMsgHashes"
+            }
+        ],
+        "constant": false
     },
     {
-        "constant": true,
-        "inputs": [],
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
         "name": "stakedAmount",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
         "inputs": [],
-        "name": "custodian",
+        "constant": true
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
         "outputs": [
             {
-                "name": "",
-                "type": "address"
+                "type": "address",
+                "name": ""
             }
         ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
+        "name": "custodian",
+        "inputs": [],
+        "constant": true
     },
     {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "claim",
-        "outputs": [],
-        "payable": false,
+        "type": "function",
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
+        "payable": false,
+        "outputs": [],
+        "name": "claim",
         "inputs": [
             {
-                "name": "hash",
-                "type": "bytes32"
-            },
+                "type": "uint256",
+                "name": "_tokenId"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "outputs": [
             {
-                "name": "sig",
-                "type": "bytes"
-            },
-            {
-                "name": "signer",
-                "type": "address"
+                "type": "bool",
+                "name": ""
             }
         ],
         "name": "ecverify",
-        "outputs": [
-            {
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
         "inputs": [
             {
-                "name": "_tokenId",
-                "type": "uint256"
+                "type": "bytes32",
+                "name": "hash"
+            },
+            {
+                "type": "bytes",
+                "name": "sig"
+            },
+            {
+                "type": "address",
+                "name": "signer"
             }
         ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "outputs": [],
         "name": "claimStake",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_tokenId"
+            }
+        ],
+        "constant": false
     },
     {
-        "constant": true,
-        "inputs": [],
-        "name": "tokenContract",
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
         "outputs": [
             {
-                "name": "",
-                "type": "address"
+                "type": "address",
+                "name": ""
             }
         ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
+        "name": "tokenContract",
+        "inputs": [],
+        "constant": true
     },
     {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "name": "_tokenId",
-                "type": "uint256"
-            },
-            {
-                "name": "_rawTxBundle",
-                "type": "bytes32[]"
-            },
-            {
-                "name": "_txLengths",
-                "type": "uint256[]"
-            },
-            {
-                "name": "_txMsgHashes",
-                "type": "bytes32[]"
-            },
-            {
-                "name": "_declaredNonce",
-                "type": "uint256"
-            }
-        ],
-        "name": "withdraw",
-        "outputs": [],
-        "payable": true,
+        "type": "function",
         "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "constant": true,
+        "payable": true,
+        "outputs": [],
+        "name": "withdraw",
         "inputs": [
             {
-                "name": "",
-                "type": "uint256"
+                "type": "address",
+                "name": "_to"
+            },
+            {
+                "type": "uint256",
+                "name": "_tokenId"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_rawTxBundle"
+            },
+            {
+                "type": "uint256[]",
+                "name": "_txLengths"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_txMsgHashes"
+            },
+            {
+                "type": "uint256",
+                "name": "_declaredNonce"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
             }
         ],
         "name": "tokenIdToAmount",
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "constant": true
+    },
+    {
+        "type": "function",
+        "stateMutability": "payable",
+        "payable": true,
+        "outputs": [],
+        "name": "initiateChallengeWithPastCustody",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_to"
+            },
+            {
+                "type": "uint256",
+                "name": "_tokenId"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_rawTxBundle"
+            },
+            {
+                "type": "uint256[]",
+                "name": "_txLengths"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_txMsgHashes"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "payable",
+        "payable": true,
+        "outputs": [],
+        "name": "deposit",
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_tokenId"
+            },
+            {
+                "type": "address",
+                "name": "_minter"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
         "outputs": [
             {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "name": "_tokenId",
-                "type": "uint256"
-            },
-            {
-                "name": "_rawTxBundle",
-                "type": "bytes32[]"
-            },
-            {
-                "name": "_txLengths",
-                "type": "uint256[]"
-            },
-            {
-                "name": "_txMsgHashes",
-                "type": "bytes32[]"
-            }
-        ],
-        "name": "initiateChallengeWithPastCustody",
-        "outputs": [],
-        "payable": true,
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_tokenId",
-                "type": "uint256"
-            },
-            {
-                "name": "_minter",
-                "type": "address"
-            }
-        ],
-        "name": "deposit",
-        "outputs": [],
-        "payable": true,
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "hash",
-                "type": "bytes32"
-            },
-            {
-                "name": "sig",
-                "type": "bytes"
+                "type": "address",
+                "name": ""
             }
         ],
         "name": "ecrecovery",
-        "outputs": [
-            {
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
         "inputs": [
             {
-                "name": "",
-                "type": "uint256"
+                "type": "bytes32",
+                "name": "hash"
+            },
+            {
+                "type": "bytes",
+                "name": "sig"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
             }
         ],
         "name": "challengeNonce",
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "constant": true
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "outputs": [],
+        "name": "submitCustodianDoubleSign",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_to"
+            },
+            {
+                "type": "uint256",
+                "name": "_tokenId"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_rawTxBundle"
+            },
+            {
+                "type": "uint256[]",
+                "name": "_txLengths"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_txMsgHashes"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
         "outputs": [
             {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "name": "_tokenId",
-                "type": "uint256"
-            },
-            {
-                "name": "_rawTxBundle",
-                "type": "bytes32[]"
-            },
-            {
-                "name": "_txLengths",
-                "type": "uint256[]"
-            },
-            {
-                "name": "_txMsgHashes",
-                "type": "bytes32[]"
-            }
-        ],
-        "name": "submitCustodianDoubleSign",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "name": "",
-                "type": "uint256"
+                "type": "uint256",
+                "name": ""
             }
         ],
         "name": "challengeEndNonce",
-        "outputs": [
+        "inputs": [
             {
-                "name": "",
-                "type": "uint256"
+                "type": "uint256",
+                "name": ""
             }
         ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
+        "constant": true
     },
     {
-        "constant": true,
-        "inputs": [],
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
+        "outputs": [
+            {
+                "type": "address",
+                "name": ""
+            }
+        ],
         "name": "custodianForeign",
-        "outputs": [
-            {
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_tokenContract",
-                "type": "address"
-            }
-        ],
-        "name": "setTokenContract",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "name": "_tokenId",
-                "type": "uint256"
-            },
-            {
-                "name": "_rawTxBundle",
-                "type": "bytes32[]"
-            },
-            {
-                "name": "_txLengths",
-                "type": "uint256[]"
-            },
-            {
-                "name": "_txMsgHashes",
-                "type": "bytes32[]"
-            }
-        ],
-        "name": "challengeWithFutureCustody",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
         "inputs": [],
-        "name": "depositCap",
+        "constant": true
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "outputs": [],
+        "name": "setTokenContract",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_tokenContract"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "outputs": [],
+        "name": "challengeWithFutureCustody",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_to"
+            },
+            {
+                "type": "uint256",
+                "name": "_tokenId"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_rawTxBundle"
+            },
+            {
+                "type": "uint256[]",
+                "name": "_txLengths"
+            },
+            {
+                "type": "bytes32[]",
+                "name": "_txMsgHashes"
+            }
+        ],
+        "constant": false
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "payable": false,
         "outputs": [
             {
-                "name": "",
-                "type": "uint256"
+                "type": "uint256",
+                "name": ""
             }
         ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
+        "name": "depositCap",
+        "inputs": [],
+        "constant": true
     },
     {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_custodianForeign",
-                "type": "address"
-            }
-        ],
-        "name": "setCustodianForeign",
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "payable": false,
         "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
+        "name": "setCustodianForeign",
         "inputs": [
             {
-                "name": "_custodian",
-                "type": "address"
+                "type": "address",
+                "name": "_custodianForeign"
             }
         ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "constructor"
+        "constant": false
     },
     {
-        "payable": true,
+        "type": "constructor",
+        "stateMutability": "nonpayable",
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_custodian"
+            }
+        ]
+    },
+    {
+        "type": "fallback",
         "stateMutability": "payable",
-        "type": "fallback"
+        "payable": true
     },
     {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "name": "depositer",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "name": "minter",
-                "type": "address"
-            }
-        ],
+        "type": "event",
         "name": "Deposit",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
-                "name": "challenger",
-                "type": "address"
+                "type": "address",
+                "name": "depositer",
+                "indexed": true
             },
             {
-                "indexed": true,
-                "name": "depositedTo",
-                "type": "address"
+                "type": "uint256",
+                "name": "amount",
+                "indexed": false
             },
             {
-                "indexed": false,
+                "type": "uint256",
                 "name": "tokenId",
-                "type": "uint256"
+                "indexed": false
+            },
+            {
+                "type": "address",
+                "name": "minter",
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "ChallengeInitiated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
-                "name": "rechallenger",
-                "type": "address"
+                "type": "address",
+                "name": "challenger",
+                "indexed": true
             },
             {
-                "indexed": true,
+                "type": "address",
                 "name": "depositedTo",
-                "type": "address"
+                "indexed": true
             },
             {
-                "indexed": false,
+                "type": "uint256",
                 "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "name": "finalChallengeNonce",
-                "type": "uint256"
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "Challenge",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
+                "type": "address",
+                "name": "rechallenger",
+                "indexed": true
+            },
+            {
+                "type": "address",
+                "name": "depositedTo",
+                "indexed": true
+            },
+            {
+                "type": "uint256",
                 "name": "tokenId",
-                "type": "uint256"
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "finalChallengeNonce",
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "ChallengeResolved",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
-                "name": "withdrawer",
-                "type": "address"
-            },
-            {
-                "indexed": true,
+                "type": "uint256",
                 "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "name": "stakedAmount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "name": "declaredNonce",
-                "type": "uint256"
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "Withdrawal",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "name": "tx1",
-                "type": "bytes"
+                "type": "address",
+                "name": "withdrawer",
+                "indexed": true
             },
             {
-                "indexed": false,
-                "name": "tx2",
-                "type": "bytes"
+                "type": "uint256",
+                "name": "tokenId",
+                "indexed": true
             },
             {
-                "indexed": false,
-                "name": "tx3",
-                "type": "bytes"
+                "type": "uint256",
+                "name": "stakedAmount",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "declaredNonce",
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "Test",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "name": "out",
-                "type": "bytes"
+                "type": "bytes",
+                "name": "tx1",
+                "indexed": false
+            },
+            {
+                "type": "bytes",
+                "name": "tx2",
+                "indexed": false
+            },
+            {
+                "type": "bytes",
+                "name": "tx3",
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "Trace",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
+                "type": "bytes",
                 "name": "out",
-                "type": "address"
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "TraceAddress",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
+                "type": "address",
                 "name": "out",
-                "type": "bytes32"
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "Trace32",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
+                "type": "bytes32",
                 "name": "out",
-                "type": "uint256"
+                "indexed": false
             }
         ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
         "name": "TraceUint256",
-        "type": "event"
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "out",
+                "indexed": false
+            }
+        ],
+        "anonymous": false
     }
 ]`
 };

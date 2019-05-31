@@ -5,6 +5,7 @@ import {WithdrawComponent} from './withdraw.component';
 import {RouterModule} from '@angular/router';
 import { NgbAlertModule, NgbTooltipModule, NgbTabsetModule} from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '../util/shared.module';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   imports: [
@@ -14,7 +15,8 @@ import { SharedModule } from '../util/shared.module';
     NgbAlertModule,
     NgbTooltipModule,
     NgbTabsetModule,
-    SharedModule
+    SharedModule,
+    ClipboardModule
   ],
   declarations: [WithdrawComponent],
   exports: [WithdrawComponent]

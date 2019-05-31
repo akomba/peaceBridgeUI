@@ -3,14 +3,17 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MintComponent} from './mint.component';
 import {RouterModule} from '@angular/router';
-import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
     FormsModule,
-    NgbAlertModule
+    NgbAlertModule,
+    ClipboardModule,
+    NgbTooltipModule
   ],
   declarations: [MintComponent],
   exports: [MintComponent]

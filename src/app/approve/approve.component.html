@@ -1,8 +1,14 @@
 <div class="row">
   <div class="col-md-12">
     <h1 class="display-4 text-center">Custodian approve</h1>
-    <b>Token Contract address:</b> {{tokenContractAddr}} <a href="https://kovan.etherscan.io/address/{{tokenContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
-    
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-3 contract-container">
+          <h5>Token Contract address:</h5>
+          <p class="hash mb-0 mt-1" ngxClipboard [cbContent]="tokenContractAddr"><span ngbTooltip="Click to copy to clipboard">{{tokenContractAddr}}</span>
+            <a href="https://{{_bs.getForeignBlockExplorer()}}/address/{{tokenContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+          </p>
+        </div>
+      </div>
   </div>
 
 
@@ -12,7 +18,7 @@
     </ngb-alert>
   </div>
 
-  <div class="col-md-12">
+  <div class="col-md-12 mt-5">
     <h3 class="text-center">Transfers requests</h3>
     <ul class="list-group transactions">
       <li *ngFor="let t of transfers" class="list-group-item">

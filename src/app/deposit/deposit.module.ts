@@ -5,6 +5,7 @@ import {DepositComponent} from './deposit.component';
 import {RouterModule} from '@angular/router';
 import { NgbAlertModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '../util/shared.module';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   imports: [
@@ -13,7 +14,8 @@ import { SharedModule } from '../util/shared.module';
     FormsModule,
     NgbAlertModule,
     NgbTooltipModule,
-    SharedModule
+    SharedModule,
+    ClipboardModule
   ],
   declarations: [DepositComponent],
   exports: [DepositComponent]

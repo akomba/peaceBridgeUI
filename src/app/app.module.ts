@@ -15,6 +15,8 @@ import { ChallengeModule } from './challenge/challenge.module';
 import { NotFound404Component } from './not-found404.component';
 import { SharedModule } from './util/shared.module';
 import { FraudModule } from './fraud/fraud.module';
+import { ClipboardModule} from 'ngx-clipboard';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,7 @@ import { FraudModule } from './fraud/fraud.module';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    ClipboardModule,
     UtilModule,
     SharedModule,
     NavbarModule,
@@ -34,7 +37,7 @@ import { FraudModule } from './fraud/fraud.module';
     WithdrawModule,
     ClaimModule,
     ChallengeModule,
-
+    NgbTooltipModule,
     FraudModule
   ],
   providers: [],

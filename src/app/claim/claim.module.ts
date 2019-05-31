@@ -3,7 +3,8 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {ClaimComponent} from './claim.component';
 import {RouterModule} from '@angular/router';
-import { NgbAlertModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbTabsetModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   imports: [
@@ -11,7 +12,9 @@ import { NgbAlertModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
     RouterModule,
     FormsModule,
     NgbAlertModule,
-    NgbTabsetModule
+    NgbTabsetModule,
+    NgbTooltipModule,
+    ClipboardModule
   ],
   declarations: [ClaimComponent],
   exports: [ClaimComponent]

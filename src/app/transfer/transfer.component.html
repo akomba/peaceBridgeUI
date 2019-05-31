@@ -1,6 +1,14 @@
 <div class="row">
   <div class="col-md-12">
     <h1 class="display-4 text-center">Transfer</h1>
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-3 contract-container">
+          <h5>Token Contract address:</h5>
+          <p class="hash mb-0 mt-1" ngxClipboard [cbContent]="tokenContractAddr"><span ngbTooltip="Click to copy to clipboard">{{tokenContractAddr}}</span>
+            <a href="https://{{_bs.getForeignBlockExplorer()}}/address/{{tokenContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+          </p>
+        </div>
+      </div>
   </div>
 
 
@@ -9,7 +17,7 @@
           <label for="token-id">Token ID</label>
           <select name="token-id" class="form-control" [(ngModel)]="tokenIdIdx">
               <option value="-1">none</option>
-              <option *ngFor="let t of tokens; let i = index" value="{{i}}">{{t | hashShortener:6}}</option>
+              <option *ngFor="let t of tokens; let i = index" value="{{i}}">{{t | hashShortener:20}}</option>
           </select>
 
 
@@ -32,7 +40,7 @@
 
   <div *ngIf="txHash != ''" class="col-md-12 mt-3 text-center">
     <ngb-alert [type]="'success'" [dismissible]="false">
-      <b>tx hash:</b> {{txHash}} <a href="https://kovan.etherscan.io/tx/{{txHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+      <b>tx hash:</b> {{txHash}} <a href="https://{{_bs.getForeignBlockExplorer()}}/tx/{{txHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
     </ngb-alert>
   </div>
 </div>

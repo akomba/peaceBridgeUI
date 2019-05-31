@@ -5,6 +5,7 @@ import {ChallengeComponent} from './challenge.component';
 import {RouterModule} from '@angular/router';
 import { NgbAlertModule, NgbTabsetModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '../util/shared.module';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   imports: [
@@ -14,7 +15,8 @@ import { SharedModule } from '../util/shared.module';
     NgbAlertModule,
     NgbTabsetModule,
     NgbTooltipModule,
-    SharedModule
+    SharedModule,
+    ClipboardModule
   ],
   declarations: [ChallengeComponent],
   exports: [ChallengeComponent]

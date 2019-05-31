@@ -31,6 +31,10 @@
     color: #444;
 }
 
+.address {
+  cursor: pointer;
+}
+
 /* .transactions .list-group-item {
   position: relative;
 }

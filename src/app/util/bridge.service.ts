@@ -3,6 +3,9 @@ import Web3 from 'web3';
 import { contractAbis } from './abis';
 import { Subject, Observable } from 'rxjs';
 
+declare var require: any;
+declare let window: any;
+
 
 const EthereumTx: any = require('ethereumjs-tx');
 const Account: any = require('eth-lib/lib/account');
@@ -10,14 +13,16 @@ const RLP: any = require('eth-lib/lib/rlp');
 const Bytes: any = require('eth-lib/lib/bytes');
 const Hash: any = require('eth-lib/lib/hash');
 
-const queryRange = 50000; // in blocks...
+const QUERY_RANGE = 50000; // in blocks...
+const TOKEN_CONTRACT_ADDRESS = '0x20dD16A7CFb58b1a61a79CC0FD014342e75C16c7';
+// const DEPOSIT_CONTRACT_ADDRESS = '0x2Ac55CA0a8CD28B4355bc7737B41aAd3f0117904'; // Ropsten
+const DEPOSIT_CONTRACT_ADDRESS = '0x3fb03455923341b0176947e395f46d086c38fe7d'; // Kotti
 
-const tokenContractAddr = '0x20dD16A7CFb58b1a61a79CC0FD014342e75C16c7';
-// const depositContractAddr = '0x2Ac55CA0a8CD28B4355bc7737B41aAd3f0117904'; //Ropsten
-const depositContractAddr = '0x3fb03455923341b0176947e395f46d086c38fe7d'; //Kotti
+const FOREIGN_PROVIDER = 'https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa';
+const HOME_PROVIDER = 'http://localhost:8545';
+const HOME_BLOCK_EXPLORER = 'kottiexplorer.ethernode.io';
+const FOREIGN_BLOCK_EXPLORER = 'kovan.etherscan.io';
 
-declare var require: any;
-declare let window: any;
 
 export const gasPerChallenge = 206250;
 export const gasPrice = 10000000000;
@@ -45,12 +50,11 @@ export class BridgeService {
 
 
   private connectedNetwork = '';
-
-  private tokenContractWeb3: any = null;
-  private tokenContractInfuraWeb3: any = null;
-  private depositContractWeb3: any = null;
-
   private selectedAddress: string = null;
+
+  // for read
+  private tokenContractWeb3: any = null;
+  private depositContractWeb3: any = null;
 
 
   // providers
@@ -81,9 +85,8 @@ export class BridgeService {
       if (typeof window.web3 !== 'undefined') {
 
         this.web3 = new Web3(window.web3.currentProvider);
-//        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('https://kotti.ethereumclassic.network'));
-        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
-        this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa'));
+        this.homeWeb3 = new Web3(new Web3.providers.HttpProvider(HOME_PROVIDER));
+        this.foreignWeb3 = new Web3(new Web3.providers.HttpProvider(FOREIGN_PROVIDER));
 
         // get the first account
         const accounts = await this.web3.eth.getAccounts();
@@ -101,60 +104,64 @@ export class BridgeService {
           }
         }, 600);
 
-        this.tokenContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
-        this.tokenContractInfuraWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), tokenContractAddr);
-        // this.depositContractWeb3 = new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
-        this.depositContractWeb3 = new this.homeWeb3.eth.Contract(JSON.parse(contractAbis.depositAbi), depositContractAddr);
+        this.tokenContractWeb3 = new this.foreignWeb3.eth.Contract(JSON.parse(contractAbis.tokenAbi), TOKEN_CONTRACT_ADDRESS);
+        this.depositContractWeb3 = new this.homeWeb3.eth.Contract(JSON.parse(contractAbis.depositAbi), DEPOSIT_CONTRACT_ADDRESS);
 
 
         this.web3.eth.net.getId().then(netId => {
-
           if (netId === this.networks.foreign.id) {
             this.connectedNetwork = 'foreign';
           } else {
             this.connectedNetwork = 'home';
           }
         });
-
-/*
-        this.web3.eth.getProtocolVersion().then(res => {
-          console.log(res);
-        });
-
-
-        this.web3.eth.getBlockTransactionCount(6000000).then(res => {
-          console.log('block tx count', res);
-        });
-
-        console.log(this.web3);
-        console.log(this.web3.currentProvider); */
-
       }
   }
 
   /* Contract functions */
   public mintToken (amount: any) {
     if (this.selectedAddress !== null) {
-      return this.tokenContractWeb3.methods.mint(amount, this.selectedAddress).send({from: this.selectedAddress });
+      const tokenContract = this.getTokenContract();
+      return tokenContract.methods.mint(amount, this.selectedAddress).send({from: this.selectedAddress });
     } else {
       throw ({message: 'No address found.'});
     }
   }
 
   public depositToken (tokenId: string, minterAddress: string, amount: string) {
-    return this.depositContractWeb3.methods.deposit(tokenId, minterAddress).send({from: this.selectedAddress, value: amount });
+    if (this.selectedAddress !== null) {
+     const depositContract = this.getDepositContract();
+     return depositContract.methods.deposit(tokenId, minterAddress).send({from: this.selectedAddress, value: amount });
+    } else {
+      throw ({message: 'No address found.'});
+    }
   }
 
   public transferToken(toAdress, tokenId, declaredNonce) {
-    return this.tokenContractWeb3.methods.transferFrom(this.selectedAddress, toAdress, tokenId, declaredNonce).send({from: this.selectedAddress});
+    if (this.selectedAddress !== null) {
+      const tokenContract = this.getTokenContract();
+      return tokenContract.methods.transferFrom(this.selectedAddress, toAdress, tokenId, declaredNonce).send({from: this.selectedAddress});
+    } else {
+       throw ({message: 'No address found.'});
+    }
   }
 
   public custodianApprove(tokenId: string, nonce: any) {
-    return this.tokenContractWeb3.methods.custodianApprove(tokenId, nonce).send({from: this.selectedAddress});
+    if (this.selectedAddress !== null) {
+      const tokenContract = this.getTokenContract();
+      return tokenContract.methods.custodianApprove(tokenId, nonce).send({from: this.selectedAddress});
+    } else {
+       throw ({message: 'No address found.'});
+    }
   }
 
   public withdraw(tokenId: string) {
-    return this.tokenContractWeb3.methods.withdraw(tokenId).send({from: this.selectedAddress});
+    if (this.selectedAddress !== null) {
+      const tokenContract = this.getTokenContract();
+      return tokenContract.methods.withdraw(tokenId).send({from: this.selectedAddress});
+    } else {
+       throw ({message: 'No address found.'});
+    }
   }
 
   public withdrawOnDepositContract(
@@ -166,82 +173,103 @@ export class BridgeService {
     nonce: number,
     amount: number ) {
 
-    return this.depositContractWeb3.methods.withdraw(
-      to,
-      tokenId,
-      bytes32Bundle,
-      txLengths,
-      txMsgHashes,
-      nonce).send({from: this.selectedAddress, value: amount, gas: 8000000});
+    if (this.selectedAddress !== null) {
+      const depositContract = this.getDepositContract();
+      return depositContract.methods.withdraw(
+        to,
+        tokenId,
+        bytes32Bundle,
+        txLengths,
+        txMsgHashes,
+        nonce).send({from: this.selectedAddress, value: amount, gas: 8000000});
+    } else {
+      throw ({message: 'No address found.'});
+    }
 }
 
   public claim (tokenId: string) {
-    return this.depositContractWeb3.methods.claim(tokenId).send({from: this.selectedAddress});
+    if (this.selectedAddress !== null) {
+      const depositContract = this.getDepositContract();
+      return depositContract.methods.claim(tokenId).send({from: this.selectedAddress});
+    } else {
+      throw ({message: 'No address found.'});
+    }
   }
 
   public claimStake (tokenId: string) {
-    return this.depositContractWeb3.methods.claimStake(tokenId).send({from: this.selectedAddress});
+    if (this.selectedAddress !== null) {
+      const depositContract = this.getDepositContract();
+      return depositContract.methods.claimStake(tokenId).send({from: this.selectedAddress});
+    } else {
+      throw ({message: 'No address found.'});
+    }
   }
 
   public challenge (tokenId: string, challengeArgs: any, challengeType: string, challengeEndNonce: number) {
 
-    switch (challengeType) {
+    if (this.selectedAddress !== null) {
 
-      case 'past': {
-        return this.depositContractWeb3.methods.initiateChallengeWithPastCustody(
-          this.selectedAddress,
-          tokenId,
-          challengeArgs.bytes32Bundle,
-          challengeArgs.txLengths,
-          challengeArgs.txMsgHashes)
-          .send({from: this.selectedAddress, gasPrice: gasPrice, value: gasPrice * gasPerChallenge * challengeEndNonce});
+      const depositContract = this.getDepositContract();
+      switch (challengeType) {
+        case 'past': {
+          return depositContract.methods.initiateChallengeWithPastCustody(
+            this.selectedAddress,
+            tokenId,
+            challengeArgs.bytes32Bundle,
+            challengeArgs.txLengths,
+            challengeArgs.txMsgHashes)
+            .send({from: this.selectedAddress, gasPrice: gasPrice, value: gasPrice * gasPerChallenge * challengeEndNonce});
+        }
+        case 'response': {
+          return depositContract.methods.challengeWithPastCustody(
+            this.selectedAddress,
+            tokenId,
+            challengeArgs.bytes32Bundle,
+            challengeArgs.txLengths,
+            challengeArgs.txMsgHashes)
+            .send({from: this.selectedAddress});
+          break;
+        }
+        case 'future': {
+          return depositContract.methods.challengeWithFutureCustody(
+            this.selectedAddress,
+            tokenId,
+            challengeArgs.bytes32Bundle,
+            challengeArgs.txLengths,
+            challengeArgs.txMsgHashes)
+            .send({from: this.selectedAddress});
+        }
       }
-      case 'response': {
-        return this.depositContractWeb3.methods.challengeWithPastCustody(
-          this.selectedAddress,
-          tokenId,
-          challengeArgs.bytes32Bundle,
-          challengeArgs.txLengths,
-          challengeArgs.txMsgHashes)
-          .send({from: this.selectedAddress});
-        break;
-      }
-      case 'future': {
-        return this.depositContractWeb3.methods.challengeWithFutureCustody(
-          this.selectedAddress,
-          tokenId,
-          challengeArgs.bytes32Bundle,
-          challengeArgs.txLengths,
-          challengeArgs.txMsgHashes)
-          .send({from: this.selectedAddress});
-      }
-
-
+    } else {
+      throw ({message: 'No address found.'});
     }
-
-
-
-/*     if (challengeType === 'past') {
-      return this.depositContractWeb3.methods.initiateChallengeWithPastCustody(
-        this.selectedAddress,
-        tokenId,
-        challengeArgs.bytes32Bundle,
-        challengeArgs.txLengths,
-        challengeArgs.txMsgHashes)
-        .send({from: this.selectedAddress, gasPrice: gasPrice, value: gasPrice * gasPerChallenge * 4});
-      } else {
-        return this.depositContractWeb3.methods.challengeWithFutureCustody(
-          this.selectedAddress,
-          tokenId,
-          challengeArgs.bytes32Bundle,
-          challengeArgs.txLengths,
-          challengeArgs.txMsgHashes)
-          .send({from: this.selectedAddress});
-      } */
   }
 
 
   /* Getters */
+  public getDepositContract(){
+    return new this.web3.eth.Contract(JSON.parse(contractAbis.depositAbi), DEPOSIT_CONTRACT_ADDRESS);
+  }
+
+  public getTokenContract(){
+    return new this.web3.eth.Contract(JSON.parse(contractAbis.tokenAbi), TOKEN_CONTRACT_ADDRESS);
+  }
+
+  public getHomeBlockExplorer(){
+    return HOME_BLOCK_EXPLORER;
+  }
+  public getForeignBlockExplorer(){
+    return FOREIGN_BLOCK_EXPLORER;
+  }
+
+  public getTokenContractAddr(){
+    return TOKEN_CONTRACT_ADDRESS;
+  }
+
+  public getDepositContractAddr(){
+    return DEPOSIT_CONTRACT_ADDRESS;
+  }
+
 
   public async getConnectedNetwork() {
     if (this.connectedNetwork === '') {
@@ -257,7 +285,6 @@ export class BridgeService {
     if (this.connectedNetwork === '') {
       return '';
     }
-
     return this.networks[this.connectedNetwork].name;
   }
 
@@ -266,14 +293,6 @@ export class BridgeService {
       return this.selectedAddress;
     }
     return '';
-  }
-
-  public getTokenContractAddr(){
-      return tokenContractAddr;
-  }
-
-  public getDepositContractAddr(){
-      return depositContractAddr;
   }
 
   public getBalanceForCurrentAccount() {
@@ -303,12 +322,12 @@ export class BridgeService {
 
   public async getWithdrawEventsFromTokenContract(startBlock: number, withdrawerAddress: string) {
     const topic: any[] = [this.foreignWeb3.utils.sha3('Withdraw(uint256,address)'), null, ('0x000000000000000000000000' + withdrawerAddress.slice(2).toLowerCase())];
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, startBlock );
+    return this.getW3EventLog(this.foreignWeb3, TOKEN_CONTRACT_ADDRESS, topic, startBlock );
   }
 
   public async getTransferRequestEventsFromTokenContract(startBlock?: number) {
     const topic: any[] = [this.foreignWeb3.utils.sha3('TransferRequest(address,address,uint256,uint256,bytes32)')];
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.foreignWeb3, TOKEN_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
   }
 
   public async getTransferRequestEventsFromTokenContractByToken(startBlock: number, tokenId: string ) {
@@ -316,12 +335,12 @@ export class BridgeService {
     topic[1] = null;
     topic[2] = null;
     topic[3] = tokenId;
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.foreignWeb3, TOKEN_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
   }
 
   public async getMintEventsFromTokenContract(startBlock?: number) {
     const topic: any[] = [this.foreignWeb3.utils.sha3('Mint(uint256,address,uint256,uint256)')];
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.foreignWeb3, TOKEN_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
   }
 
   public async getTransferEventsFromTokenContract(startBlock: number, fromAddress?: string, toAddress?: string) {
@@ -332,47 +351,44 @@ export class BridgeService {
     if (toAddress !== undefined && toAddress !== null) {
       topic[2] = '0x000000000000000000000000' + toAddress.slice(2).toLowerCase();
     }
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.foreignWeb3, TOKEN_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
   }
 
   public async getTransferEventsFromTokenContractByToken(startBlock: number, tokenId: string) {
     let topic: any[] = [this.foreignWeb3.utils.sha3('Transfer(address,address,uint256)'), null, null, null];
-    topic[1] = null;
-    topic[2] = null;
+/*     topic[1] = null;
+    topic[2] = null; */
     topic[3] = tokenId;
-    return this.getW3EventLog(this.foreignWeb3, tokenContractAddr, topic, (startBlock) ? startBlock : null );
+    return this.getW3EventLog(this.foreignWeb3, TOKEN_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
   }
 
-
-
   public async getDepositEventsFromDepositContract(startBlock?: number) {
-    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Deposit().options.params.topics[0]], (startBlock) ? startBlock : null );
-    let topic: any[] = [this.homeWeb3.utils.sha3('Deposit(address,uint256,uint256,address)'), null, null, null];
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, topic, (startBlock) ? startBlock : null );
+    let topic: any[] = [this.homeWeb3.utils.sha3('Deposit(address,uint256,uint256,address)')];
+    return this.getW3EventLog(this.homeWeb3, DEPOSIT_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
 
   }
 
   public async getChallengeInitiatedEventsFromDepositContract(startBlock?: number) {
-    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.ChallengeInitiated().options.params.topics[0]], (startBlock) ? startBlock : null );
+    let topic: any[] = [this.homeWeb3.utils.sha3('ChallengeInitiated(address,address,uint256)'), null, null, null];
+    return this.getW3EventLog(this.homeWeb3, DEPOSIT_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
 
   }
 
   public async getResolvedChallenges(startBlock?: number) {
-    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.ChallengeResolved().options.params.topics[0]], (startBlock) ? startBlock : null );
+    let topic: any[] = [this.homeWeb3.utils.sha3('ChallengeResolved(uint256)'), null, null, null];
+    return this.getW3EventLog(this.homeWeb3, DEPOSIT_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
 
   }
 
   public async getWithdrawalEventsFromDepositContract(startBlock?: number) {
-    // return this.getW3EventLog(this.web3, depositContractAddr, [this.depositContractWeb3.events.Withdrawal().options.params.topics[0]], (startBlock) ? startBlock : null );
-    return this.getW3EventLog(this.homeWeb3, depositContractAddr, [this.depositContractWeb3.events.Withdrawal().options.params.topics[0]], (startBlock) ? startBlock : null );
+    let topic: any[] = [this.homeWeb3.utils.sha3('Withdrawal(address,uint256,uint256,uint256)')];
+    return this.getW3EventLog(this.homeWeb3, DEPOSIT_CONTRACT_ADDRESS, topic, (startBlock) ? startBlock : null );
   }
 
   public async getW3EventLog(w3, contractAddress, topic, startBlock?) {
     if (startBlock === null) {
       const lastBlock = await w3.eth.getBlockNumber();
-      startBlock = lastBlock - queryRange;
+      startBlock = lastBlock - QUERY_RANGE;
       if (startBlock < 0) {
         startBlock = 0;
       }
@@ -393,11 +409,11 @@ export class BridgeService {
   }
 
   public getTransferNonce(tokenId) {
-    return this.tokenContractInfuraWeb3.methods.transferNonce(tokenId).call();
+    return this.tokenContractWeb3.methods.transferNonce(tokenId).call();
   }
 
   public getTokenOwner(tokenId: string) {
-    return this.tokenContractInfuraWeb3.methods.ownerOf(tokenId).call();
+    return this.tokenContractWeb3.methods.ownerOf(tokenId).call();
   }
 
   public getLastProvenCustodian(tokenId: string) {
@@ -416,7 +432,7 @@ export class BridgeService {
 
   /* Utils */
   public async generateRawTxAndMsgHash (_txHash, onForeignNetwork = false) {
-    // let w3 = this.web3;
+    // let w3 = this.web3; 
     let w3 = this.homeWeb3;
 
     if (onForeignNetwork === true) {

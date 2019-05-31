@@ -1,8 +1,16 @@
 <div class="row">
   <div class="col-md-12">
-    <h1 class="display-4 text-center">Mint</h1><br/>
-    <b>Token Contract address:</b> {{tokenContractAddr}} <a href="https://kovan.etherscan.io/address/{{tokenContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
-    
+    <h1 class="display-4 text-center">Mint</h1>
+
+    <div class="row mt-4">
+      <div class="col-md-6 offset-md-3 contract-container">
+        <h5>Token Contract address:</h5>
+        <p class="hash mb-0 mt-1" ngxClipboard [cbContent]="tokenContractAddr"><span ngbTooltip="Click to copy to clipboard">{{tokenContractAddr}}</span>
+          <a href="https://{{_bs.getForeignBlockExplorer()}}/address/{{tokenContractAddr}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+        </p>
+      </div>
+    </div>
+
   </div>
 
   <div  *ngIf="errorMessage" class="col-md-12 text-center mt-3">
@@ -24,7 +32,7 @@
   <div *ngIf="isMintingFinished" class="col-md-12 mt-3 text-center">
     <ngb-alert [type]="'success'" [dismissible]="false">
       <b>token id:</b> {{mintedTokenId}}<br/>
-      <b>tx hash:</b> {{txHash}} <a href="https://kovan.etherscan.io/tx/{{txHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
+      <b>tx hash:</b> {{txHash}} <a href="https://{{_bs.getForeignBlockExplorer()}}/tx/{{txHash}}" target="_blank"><span class="glyphicon glyphicon-link"></span></a>
     </ngb-alert>
   </div>
 

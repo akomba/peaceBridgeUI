@@ -80,9 +80,9 @@ export class ClaimComponent implements OnInit {
           if (challengeTime * 1000 > Date.now()) {
             throw({message: 'The challenge period has not ended yet'});
           }
-          if (challengeEndNonce !== lastProvenNonce) {
+          /* if (challengeEndNonce !== lastProvenNonce) {
             throw({message: 'The challenge response has not been proven to endNonce'});
-          }
+          } */
 
           const owner = await this._bs.getTokenOwner(tokenId);
           if (owner.toLowerCase() !== this._bs.getCurrentAddress().toLowerCase()) {

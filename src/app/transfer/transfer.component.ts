@@ -94,14 +94,17 @@ export class TransferComponent implements OnInit, OnDestroy {
           }
         }
         if (!match) {
-          filtered.push(tokens[i].topics[3]);
+         // filtered.push(tokens[i].topics[3]);
+         this.tokens.push(tokens[i].topics[3]);
         }
       }
 
-      // filter out withdrawn tokens
-      for (let i = 0; i < filtered.length; i++) {
+      // filter out withdrawn tokens (?)
+     /*  for (let i = 0; i < filtered.length; i++) {
         let match = false;
+        console.log('checking', filtered[i]);
         for (let j = 0; j < withdrawnTokens.length; j++ ) {
+          console.log('with', withdrawnTokens[j].topics[1]);
           if (filtered[i] === withdrawnTokens[j].topics[1]) {
             withdrawnTokens.splice(j, 1);
             match = true;
@@ -111,7 +114,7 @@ export class TransferComponent implements OnInit, OnDestroy {
         if (!match) {
           this.tokens.push(filtered[i]);
         }
-      }
+      } */
 
 
       this.isLoading = false;
@@ -134,9 +137,9 @@ export class TransferComponent implements OnInit, OnDestroy {
         // transfer
         try {
 
-          if (this.toAdress.toLowerCase() === this._bs.getCurrentAddress().toLowerCase()) {
+          /* if (this.toAdress.toLowerCase() === this._bs.getCurrentAddress().toLowerCase()) {
             throw({message: 'You can\'t send tokens to yourself'});
-          }
+          } */
 
           const txNonce = await this._bs.getTransferNonce(this.tokenId);
 

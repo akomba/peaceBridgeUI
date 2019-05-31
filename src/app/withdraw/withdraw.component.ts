@@ -31,6 +31,9 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     public tokens: any [] = [];
     public withdrawnTokens: any [] = [];
 
+    public tokenContractAddr = '';
+    public depositContractAddr = '';
+
     private accountChangeRef: Subscription = null;
 
     constructor(public _bs: BridgeService, private _router: Router, private route: ActivatedRoute, private zone: NgZone) {
@@ -70,6 +73,8 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
         }
       }
+      this.tokenContractAddr = this._bs.getTokenContractAddr();
+      this.depositContractAddr = this._bs.getDepositContractAddr();
     }
 
     public ngOnDestroy(): void {
@@ -96,9 +101,9 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
       // filter mints
       for (let i = 0; i < allIncoming.length; i++) {
-        if (allIncoming[i].topics[1] !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-          incoming.push(allIncoming[i]);
-        }
+         if (allIncoming[i].topics[1] !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+            incoming.push(allIncoming[i]);
+         }
       }
 
       // filter outgoing transfers
@@ -160,16 +165,13 @@ export class WithdrawComponent implements OnInit, OnDestroy {
           throw({message: 'Transaction not found'});
         }
         this.tokenId = res.logs[0].topics[3];
-
         const owner = await this._bs.getTokenOwner(this.tokenId);
         if (owner.toLowerCase() !== this._bs.getCurrentAddress().toLowerCase()) {
           throw({message: 'No token id found'});
         }
 
-
         // getting the transaction hash
         this.transferTxHash =  await this.getTransferTxHash(res);
-
         const txNonce = await this._bs.getTransferNonce(this.tokenId);
 
         if ( this.transferTxHash === null) {
@@ -177,15 +179,12 @@ export class WithdrawComponent implements OnInit, OnDestroy {
         }
 
         const tx: any = await this._bs.withdraw(this.tokenId);
-
-
         this.withdrawTxHash = tx.transactionHash;
 
-        const rawTransferFrom = await this._bs.generateRawTxAndMsgHash(this.transferTxHash);
-        const rawCustodianApprove = await this._bs.generateRawTxAndMsgHash(this.custApproveTxHash);
-        const rawWithdrawal = await this._bs.generateRawTxAndMsgHash(this.withdrawTxHash);
+        const rawTransferFrom = await this._bs.generateRawTxAndMsgHash(this.transferTxHash, true);
+        const rawCustodianApprove = await this._bs.generateRawTxAndMsgHash(this.custApproveTxHash, true);
+        const rawWithdrawal = await this._bs.generateRawTxAndMsgHash(this.withdrawTxHash, true);
         const withdrawArgs = await this._bs.formBundleLengthsHashes([rawWithdrawal, rawTransferFrom, rawCustodianApprove]);
-
         const receipt = await this._bs.getW3TxReceipt(this.transferTxHash);
 
         let addr: string = <string>receipt['logs'][0]['topics'][2];
@@ -218,12 +217,11 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     private async getTransferTxHash(res: any) {
 
       const transfers = await this._bs.getTransferRequestEventsFromTokenContract(1);
-
       const aTopics = res.logs[0].topics;
+
 
       for (let i = 0; i < transfers.length; i++) {
         let topics = transfers[i].topics;
-
         if (topics[3] === aTopics[3] && topics[2] === aTopics[2] && topics[1] === aTopics[1]) {
           return transfers[i].transactionHash;
         }
