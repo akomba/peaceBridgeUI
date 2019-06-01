@@ -1,9 +1,9 @@
 <app-nav-bar></app-nav-bar>
 
 <div class="jumbotron text-center">
-  <h1 class="nunito-bold">Peace Bridge</h1>
-  <h5>Network: {{ _bs.getConnectedNetworkName() }} </h5>
-  <h5 class="address" ngbTooltip="Click to copy to clipboard"  ngxClipboard [cbContent]="currentAccount">Address: {{ currentAccount | hashShortener:4}} <small><i class="glyphicon glyphicon-copy"></i></small></h5>
+  <h1 class="nunito-bold"><strong>peaceBridge</strong></h1>
+  <h5><strong>Network:</strong> {{ _bs.getConnectedNetworkName() }} </h5>
+  <h5 class="address" ngbTooltip="Click to copy to clipboard"  ngxClipboard [cbContent]="currentAccount"><strong>Address:</strong> {{ currentAccount | hashShortener:4}} <small><i class="glyphicon glyphicon-copy"></i></small></h5>
 </div>
 
 <div id="start-here"  class="container-fluid">

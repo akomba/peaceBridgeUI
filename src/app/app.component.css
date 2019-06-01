@@ -3,6 +3,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.jumbotron{
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace !important; 
+}
+
+h1{
+  font-size: 550%
+}
+
 .load-indicator{
   position: fixed;
   top: 0;

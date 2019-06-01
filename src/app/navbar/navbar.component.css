@@ -1,4 +1,9 @@
+.nav-item{
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;   
+}
+
 .navbar-brand{
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace; 
   display:block;
   width:130px;
   height:60px;
@@ -8,6 +13,7 @@
 }
 
 .navbar-nav>li>a{
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace; 
   color:#111;
   transition: all 0.2s ease;
   margin-top: 0px;

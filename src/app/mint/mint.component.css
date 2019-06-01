@@ -1,0 +1,16 @@
+.row{
+    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace !important; 
+}
+
+.mid{
+    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace !important; 
+}
+
+h5{
+    font-weight: bold;
+}
+
+.btn{
+    background-color: darkolivegreen;
+    border-color: darkolivegreen
+  }

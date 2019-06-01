@@ -1,3 +1,7 @@
+.row{
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace !important; 
+}
+
 ul.transactions span{
   display: block;
 }
@@ -5,4 +9,17 @@ ul.transactions span{
 /* latest block to the top */
 .list-group {
   flex-direction: column-reverse;
+}
+
+h5{
+  font-weight: bold;
+}
+
+.mid{
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace !important; 
+}
+
+.btn{
+  background-color: darkolivegreen;
+  border-color: darkolivegreen
 }
