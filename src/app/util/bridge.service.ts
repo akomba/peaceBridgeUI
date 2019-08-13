@@ -19,7 +19,8 @@ const TOKEN_CONTRACT_ADDRESS = '0x20dD16A7CFb58b1a61a79CC0FD014342e75C16c7';
 const DEPOSIT_CONTRACT_ADDRESS = '0x3fb03455923341b0176947e395f46d086c38fe7d'; // Kotti
 
 const FOREIGN_PROVIDER = 'https://kovan.infura.io/v3/e4d8f9fcacfd46ec872c77d66711e1aa';
-const HOME_PROVIDER = 'http://localhost:8545';
+// const HOME_PROVIDER = 'http://localhost:8545';
+const HOME_PROVIDER = 'https://www.ethercluster.com/etc';
 const HOME_BLOCK_EXPLORER = 'kottiexplorer.ethernode.io';
 const FOREIGN_BLOCK_EXPLORER = 'kovan.etherscan.io';
 
