@@ -38,8 +38,7 @@
             </div>
             <div class="col-md-3">
               <span class="amount"><b>amount:</b></span>
-              <input type="number" class="form-control" id="minter-address-{{i}}" name="minter-address-{{i}}" [(ngModel)]="t.amount" >
-
+              <input type="text" class="form-control" id="minter-address-{{i}}" name="minter-address-{{i}}" [(ngModel)]="t.amount" >
             </div>
             <div class="col-md-3">
               <span class="minter-address" ngbTooltip="{{t.minter}}"><b>minter:</b> {{t.minter | hashShortener:4}}</span>

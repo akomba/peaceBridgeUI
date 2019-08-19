@@ -55,7 +55,7 @@ export class TransferComponent implements OnInit, OnDestroy {
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'ethereum') {
-        this.loaderMessage = 'Please connect to the foreign network!';
+        this.loaderMessage = 'Please connect to the foreign network!' + ' (' + this._bs.getForeignNetworkName() + ')';
         return;
       }
 

@@ -1,6 +1,7 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import { Router } from '@angular/router';
 import { BridgeService} from '../util/bridge.service';
+import BigNumber from 'bignumber.js';
 
 @Component({
   selector: 'app-mint',
@@ -33,7 +34,7 @@ export class MintComponent implements OnInit {
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'ethereum') {
-        this.loaderMessage = 'Please connect to the foreign network!';
+        this.loaderMessage = 'Please connect to the foreign network!' + ' (' + this._bs.getForeignNetworkName() + ')';
         return;
       }
       this.tokenContractAddr = this._bs.getTokenContractAddr();
@@ -48,7 +49,17 @@ export class MintComponent implements OnInit {
       this.isMintingFinished = false;
       this.isLoading = true;
       try {
-        result = await this._bs.mintToken(this.amountToMint);
+
+        const amount = this._bs.toBN(this._bs.toWei(this.amountToMint));
+        const balance = this._bs.toBN(await this._bs.getBalanceForCurrentAccount());
+
+        if (balance.isLessThan(amount)) {
+          console.log('HE');
+          throw ({message: 'Not enough funds.'});
+        }
+
+        result = await this._bs.mintToken(amount.toString());
+
         this.mintedTokenId = this._bs.toHex(result.events.Mint.returnValues.tokenId);
         this.txHash = result.transactionHash;
         this.isMintingFinished = true;
@@ -57,5 +68,9 @@ export class MintComponent implements OnInit {
         this.errorMessage = e.message;
         this.isLoading = false;
       }
+    }
+
+    public clearErrorMsg() {
+      this.errorMessage = '';
     }
 }

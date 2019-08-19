@@ -40,12 +40,14 @@ export class BridgeService {
     foreign: {
       id: 42,
       code: 'ethereum',
-      name: 'Ethereum'
+      name: 'Ethereum',
+      networkName: 'kovan'
     },
     home: {
       id: 6,
       code: 'classic',
-      name: 'Ethereum Classic'
+      name: 'Ethereum Classic',
+      networkName: 'kotti'
     }
   };
 
@@ -132,6 +134,10 @@ export class BridgeService {
   public depositToken (tokenId: string, minterAddress: string, amount: string) {
     if (this.selectedAddress !== null) {
      const depositContract = this.getDepositContract();
+
+     console.log('contract', depositContract);
+
+
      return depositContract.methods.deposit(tokenId, minterAddress).send({from: this.selectedAddress, value: amount });
     } else {
       throw ({message: 'No address found.'});
@@ -269,6 +275,14 @@ export class BridgeService {
 
   public getDepositContractAddr(){
     return DEPOSIT_CONTRACT_ADDRESS;
+  }
+
+  public getHomeNetworkName(){
+    return this.networks.home.networkName;
+  }
+
+  public getForeignNetworkName(){
+    return this.networks.foreign.networkName;
   }
 
 
@@ -432,6 +446,19 @@ export class BridgeService {
 
 
   /* Utils */
+
+  public toWei(ethAmount: any) {
+    return this.web3.utils.toWei(ethAmount, 'ether');
+  }
+
+  public toEth(weiAmount: any) {
+    return this.web3.utils.fromWei(weiAmount, 'ether');
+  }
+
+  public toBN(value: any) {
+    return this.web3.utils.toBN(value);
+  }
+
   public async generateRawTxAndMsgHash (_txHash, onForeignNetwork = false) {
     // let w3 = this.web3; 
     let w3 = this.homeWeb3;

@@ -36,7 +36,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       const connectedNetwork = await this._bs.getConnectedNetwork();
 
       if (connectedNetwork !== 'classic') {
-        this.loaderMessage = 'Please connect to the home network!';
+        this.loaderMessage = 'Please connect to the home network!' + ' (' + this._bs.getHomeNetworkName() + ')';
         return;
       } else {
         this.isLoading = false;
@@ -87,10 +87,16 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     public async deposit(index: number) {
       this.errorMessage = '';
-      if ( this.mintedTokensFiltered[index].amount === null || this.mintedTokensFiltered[index].amount === 0) {
+
+
+
+
+      if ( this.mintedTokensFiltered[index].amount === '' || parseFloat(this.mintedTokensFiltered[index].amount) === 0) {
         this.errorMessage = 'Amount can\'t be 0';
         return;
       }
+
+      const amount: any = this._bs.toWei(this.mintedTokensFiltered[index].amount);
 
       this.isLoading = true;
       this.errorMessage = '';
@@ -98,7 +104,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       try {
         const depositResult: any = await this._bs.depositToken(this.mintedTokensFiltered[index].tokenId,
                                                           this.mintedTokensFiltered[index].minter,
-                                                          this.mintedTokensFiltered[index].amount);
+                                                         amount/* this.mintedTokensFiltered[index].amount */);
         this.transactionHash = depositResult.transactionHash;
         this.isLoading = false;
       } catch (e) {
@@ -116,7 +122,7 @@ export class DepositComponent implements OnInit, OnDestroy {
        if ('0x' + res[i].topics[1].slice(26).toLowerCase() === minter.toLowerCase()) {
           eventsLog.push({
             tokenId: '0x' + res[i].data.slice(130),
-            amount: parseInt(res[i].data.slice(2, 66), 16),
+            amount:  this._bs.toEth(this._bs.toBN(res[i].data.slice(0, 66))), // parseInt(res[i].data.slice(2, 66), 16),
             minter: '0x' + res[i].topics[1].slice(26)
           });
         }

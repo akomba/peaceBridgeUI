@@ -21,8 +21,8 @@
 
   <div class="col-md-12 mt-3">
     <div class="form-group mt-3">
-      <label for="depositAmount">Mint amount</label>
-      <input type="text" class="form-control" id="mintAmount" name="mintAmount" placeholder="Amount" [(ngModel)]="amountToMint">
+      <label for="depositAmount">Mint amount in ETH</label>
+      <input type="text" class="form-control" id="mintAmount" name="mintAmount" placeholder="Amount" [(ngModel)]="amountToMint" (click)="clearErrorMsg()">
     </div>
     <div class="mt-4 text-center">
       <button class="btn btn-success" (click)="mint()">Mint</button>

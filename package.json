@@ -8,7 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "node patch.js"
+    "postinstall": "node patch.js",
+    "deploy": "ng build --prod --base-href '/' && npx ngh --dir dist/peaceBridge"
   },
   "private": true,
   "dependencies": {
@@ -22,6 +23,7 @@
     "@angular/platform-browser-dynamic": "~7.0.0",
     "@angular/router": "~7.0.0",
     "@ng-bootstrap/ng-bootstrap": "^4.0.0",
+    "bignumber.js": "^9.0.0",
     "core-js": "^2.5.4",
     "eth-lib": "^0.2.8",
     "ethereumjs-tx": "^1.3.3",

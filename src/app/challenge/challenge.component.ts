@@ -52,7 +52,7 @@ export class ChallengeComponent implements OnInit {
       const now = new Date().getTime();
 
       if (connectedNetwork !== 'classic') {
-        this.loaderMessage = 'Please connect to the home network!';
+        this.loaderMessage = 'Please connect to the home network!' + ' (' + this._bs.getHomeNetworkName() + ')';
       } else {
         this.loaderMessage = 'Collecting withdrawals';
         await this.getWithdrawals();

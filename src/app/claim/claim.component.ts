@@ -32,7 +32,7 @@ export class ClaimComponent implements OnInit {
       this.loaderMessage = 'Connecting to network';
       const connectedNetwork = await this._bs.getConnectedNetwork();
       if (connectedNetwork !== 'classic') {
-        this.loaderMessage = 'Please connect to the home network!';
+        this.loaderMessage = 'Please connect to the home network!' + ' (' + this._bs.getHomeNetworkName() + ')';
         return;
       }
 
